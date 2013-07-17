@@ -1,4 +1,4 @@
-package com.typesfafe.sbt
+package com.typesafe.sbt
 
 import org.apache.maven.repository.internal.MavenServiceLocator
 import org.apache.maven.repository.internal.MavenRepositorySystemSession

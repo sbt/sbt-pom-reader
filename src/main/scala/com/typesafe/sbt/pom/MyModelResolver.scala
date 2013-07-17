@@ -1,4 +1,4 @@
-package com.typesfafe.sbt.pom
+package com.typesafe.sbt.pom
 
 
 import java.io.File

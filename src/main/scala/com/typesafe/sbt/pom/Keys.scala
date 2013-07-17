@@ -1,4 +1,4 @@
-package com.typesfafe.sbt.pom
+package com.typesafe.sbt.pom
 
 import sbt._
 import org.apache.maven.model.Model

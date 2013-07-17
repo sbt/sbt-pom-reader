@@ -1,4 +1,4 @@
-package com.typesfafe.sbt.pom
+package com.typesafe.sbt.pom
 
 
 import org.sonatype.aether.repository.RemoteRepository
@@ -27,11 +27,17 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
    
    private val modelBuilder = (new DefaultModelBuilderFactory).newInstance
    
+   private val defaultRepositories: Seq[RemoteRepository] =
+     Seq(
+       new RemoteRepository( "central", "default", " http://repo.maven.apache.org/maven2" )    
+     )
+   
    // TODO - Add repositories from the pom...
    val modelResolver: ModelResolver = {
      new MyModelResolver(
        session,
-       system // ArtifactResolver
+       system,
+       repositories = defaultRepositories
      )
      
    }
