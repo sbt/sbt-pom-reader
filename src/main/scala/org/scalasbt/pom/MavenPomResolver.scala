@@ -13,8 +13,8 @@ import org.apache.maven.model.building.{
 }
 import collection.JavaConverters._
 import java.util.Locale
-
-
+import org.apache.maven.model.resolution.ModelResolver
+import org.apache.maven.artifact.resolver.DefaultArtifactResolver
 
 object MvnPomResolver {
   val system = newRepositorySystemImpl
@@ -25,7 +25,16 @@ object MvnPomResolver {
 class MvnPomResolver(system: RepositorySystem, localRepo: File) {
    val session = newSessionImpl(system, localRepo)
    
-   private val modelBuilder = (new DefaultModelBuilderFactory).newInstance 
+   private val modelBuilder = (new DefaultModelBuilderFactory).newInstance
+   
+   // TODO - Add repositories from the pom...
+   val modelResolver: ModelResolver = {
+     new MyModelResolver(
+       session,
+       system // ArtifactResolver
+     )
+     
+   }
    
    def loadEffectivePom(pomFile: File, repositories: Seq[RemoteRepository]): Model =
      try {
@@ -39,7 +48,7 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
        request setUserProperties userProperties
        // TODO - profiles?
        // TODO - Model resolver?
-       // request setModelResolver resolver
+       request setModelResolver modelResolver
        (modelBuilder build request).getEffectiveModel
      } catch {
        case e: ModelBuildingException => 

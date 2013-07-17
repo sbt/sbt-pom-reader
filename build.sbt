@@ -1,6 +1,6 @@
 name := "sbt-pom-reader"
 
-organization := "org.scala-sbt.plugins"
+organization := "com.typesafe.sbt"
 
 sbtPlugin := true
 
