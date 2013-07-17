@@ -1,4 +1,4 @@
-package org.scalasbt.pom
+package com.typesfafe.sbt.pom
 
 import sbt._
 import org.apache.maven.model.Model

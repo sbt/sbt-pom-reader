@@ -1,4 +1,4 @@
-package org.scalasbt
+package com.typesfafe.sbt
 
 import org.apache.maven.repository.internal.MavenServiceLocator
 import org.apache.maven.repository.internal.MavenRepositorySystemSession
