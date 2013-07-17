@@ -22,6 +22,7 @@ package object pom {
   def newRepositorySystemImpl: RepositorySystem = {
     val locator = new MavenServiceLocator
     locator.addService(classOf[RepositoryConnectorFactory], classOf[WagonRepositoryConnectorFactory])
+    locator.setServices(classOf[WagonProvider], new HackedWagonProvider)
     locator.getService(classOf[RepositorySystem])
   }
   def newSessionImpl(system: RepositorySystem, localRepoDir: File): RepositorySystemSession  = {
