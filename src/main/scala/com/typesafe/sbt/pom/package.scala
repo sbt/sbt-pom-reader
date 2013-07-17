@@ -25,7 +25,7 @@ package object pom {
     locator.getService(classOf[RepositorySystem])
   }
   def newSessionImpl(system: RepositorySystem, localRepoDir: File): RepositorySystemSession  = {
-    val session = new MavenRepositorySystemSession();
+    val session = new MavenRepositorySystemSession
     val localRepo = new LocalRepository(localRepoDir.getAbsolutePath)
     session setLocalRepositoryManager (system newLocalRepositoryManager localRepo)
     session
