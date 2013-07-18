@@ -5,7 +5,8 @@ import Keys._
 import org.apache.maven.model.{
   Model => PomModel,
   Plugin => PomPlugin,
-  Dependency => PomDependency
+  Dependency => PomDependency,
+  Repository => PomRepository
 }
 import Project.Initialize
 import SbtPomKeys._
@@ -24,7 +25,8 @@ object MavenHelper {
     resolvers <++= fromPom(getResolvers),
     scalacOptions <++= (effectivePom) map { pom =>
       getScalacOptions(pom)
-    }
+    },
+    credentials <++= effectivePom map createSbtCredentialsFromSettingsXml
   )
   
   def fromPom[T](f: PomModel => T): Initialize[T] =
@@ -125,6 +127,78 @@ object MavenHelper {
 
   
   // TODO - Pull credentials from ~/.m2/settings.xml
+  def settingsFile = file(sys.props("user.home")) / ".m2" / "settings.xml"
+  
+  def settingsXml: scala.xml.Node =
+    sbt.Using.fileInputStream(settingsFile) { in =>
+      scala.xml.XML.load(in)
+    }
+  case class ServerCredentials(id: String, user: String, pw: String)
+  def parseServersFromSettings(xml: scala.xml.Node): Seq[ServerCredentials] = {
+    val servers = xml \ "servers" \\ "server"
+    // TODO - Support alternative layouts here...
+    val result = 
+      for(server <- servers) yield {
+        val id = (server \ "id").text
+        val user = (server \ "username").text
+        val pw = (server \ "password").text
+        ServerCredentials(id, user, pw)
+      }
+    result filterNot { x =>
+      x.user.isEmpty || x.pw.isEmpty  
+    }
+  }
+  def settingsXmlServers: Seq[ServerCredentials] = 
+    parseServersFromSettings(settingsXml)
+  
+  // TODO - Grab authentication realm...
+  def matchCredentialsWithServers(creds: Seq[ServerCredentials], pom: PomModel): Seq[(PomRepository, ServerCredentials)] = {
+    for {
+      repo <- pom.getRepositories.asScala
+      cred <- creds
+      if cred.id == repo.getId
+    } yield (repo -> cred)
+  }
+  
+  
+  // Attempts to perform an unathorized action so we can detect the supported
+  // authentication realms of our server.  tested against nexus + artifactory.
+  def getServerRealm(method: String, uri: String): Option[String] = {
+    val con = url(uri).openConnection.asInstanceOf[java.net.HttpURLConnection]
+    con setRequestMethod method
+    if(con.getResponseCode == 401) {
+      val authRealmConfigs = con.getHeaderField("WWW-Authenticate")
+      val BasicRealm = new scala.util.matching.Regex(""".*[Bb][Aa][Ss][Ii][Cc] [Rr][Ee][Aa][Ll][Mm]\=\"(.*)\".*""")
+      // Artifactory appears not to ask for authentication realm,but nexus does immediately.
+      BasicRealm.unapplySeq(authRealmConfigs) flatMap (_.headOption)
+    } else None
+  }
+  
+  
+  def getServerRealm(uri: String): String = {
+    // We have to try both PUT and POST because of Nexus vs. Artifactory differences on when they
+    // report authentication realm issues.
+    getServerRealm("PUT", uri) orElse
+    getServerRealm("POST", uri) getOrElse 
+    sys.error("Unable to determine authentication realm for: " + uri)
+  }
+  
+  def getHost(uri: String): String =
+    url(uri).getHost
+  
+  def makeSbtCredentials(creds: Seq[(PomRepository, ServerCredentials)]) =
+    for {
+      (repo, cred) <- creds
+      realm = getServerRealm(repo.getUrl)
+      host = getHost(repo.getUrl)
+    } yield Credentials(realm, host, cred.user, cred.pw)
+    
+    
+  def createSbtCredentialsFromSettingsXml(pom: PomModel): Seq[Credentials] = {
+    val serverConfig = settingsXmlServers
+    val matched = matchCredentialsWithServers(serverConfig, pom)
+    makeSbtCredentials(matched)
+  }
   // TODO - Pull source/resource directories from pom...
   
   // TODO - compiler plugins...

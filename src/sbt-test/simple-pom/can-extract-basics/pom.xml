@@ -54,6 +54,11 @@
       <id>DUMMY-REPO</id>
       <url>http://my-dum-repo.org</url>
     </repository>
+    <repository>
+      <id>sonatype-nexus</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    
   </repositories>
 
 </project>
