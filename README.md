@@ -10,9 +10,17 @@ This project aims to read maven pom files and configure sbt appropriately.  We h
 6. Multi-module builds should work assuming each project meets an above caveat (at least, once we implement support).
 
 
-The only config you should require in your build.sbt for a simple maven project is:
+The only config you should require in your `build.sbt` for a simple maven project is:
 
     useMavenPom
+
+The only thing you should require for a reactor maven project is in your `project/builds.scala`:
+
+    import sbt._
+    object MyBuild extends com.typesafe.sbt.pom.PomBuild
+
+
+Please feel free to contribute example/test maven projects you'd like to be able to load in sbt.
 
 
 # Licensing
