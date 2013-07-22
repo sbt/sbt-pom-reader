@@ -32,7 +32,11 @@ package object pom {
     session
   }
   
+  def defaultLocalRepo: java.io.File = {
+    import sbt._
+    (file(sys.props("user.home")) / ".m2" / "repository")
+  }
   
-  def loadEffectivePom(localRepo: File, pom: File) = 
+  def loadEffectivePom(pom: File, localRepo: File = defaultLocalRepo) = 
     MvnPomResolver(localRepo).loadEffectivePom(pom, Seq.empty)
 }

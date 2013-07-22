@@ -1,0 +1,23 @@
+package com.typesafe.sbt.pom
+
+import sbt._
+import Keys._
+import org.apache.maven.model.{Model => PomModel}
+import Project.Initialize
+
+/** A helper class that allows us to load all maven reactor projects
+ *  upon boot.
+ */
+trait PomBuild extends Build {
+  import SbtPomKeys._
+  import MavenHelper._
+  
+  override def projectDefinitions(baseDirectory: File): Seq[Project] = {
+    // If we detect a maven parent pom, use it.
+    if((baseDirectory / "pom.xml").exists)
+      MavenHelper.makeReactorProject(baseDirectory)
+    else super.projectDefinitions(baseDirectory)
+  }
+}
+
+object AutoPomBuild extends PomBuild

@@ -15,11 +15,64 @@ import collection.JavaConverters._
 /** Helper object to extract maven settings. */
 object MavenHelper {
   
+  def makeReactorProject(baseDir: File): Seq[Project] = {
+    // TODO - Wire dependencies
+    for {
+      (pom, pomFile) <- allProjectsAndDirectories(baseDir)
+      name = makeProjectName(pom)
+      
+    } yield (
+      // TODO - Figure out how to determine dependencies on projects...
+      sbt.Project(name, pomFile.getParentFile)
+      settings(useMavenPom:_*)
+    )
+  }
+  
+  def makeProjectName(pom: PomModel): String = 
+    Option(pom.getName) getOrElse pom.getArtifactId
+  
+  def allProjectsAndDirectories(base: File): Seq[(PomModel, File)] = {
+    println("Looking for reactor projects in: " + base)
+    val pom = base / "pom.xml"
+    @annotation.tailrec
+    def grabAllProjects(toCheck: List[File], all: Seq[(PomModel,File)] = Nil): Seq[(PomModel, File)] = 
+      toCheck match {
+        case next :: rest =>
+          println("Checking pom file: " + next)
+          val pom = loadEffectivePom(next)
+          val children = getChildProjectPoms(pom, next)
+          // Update what we need to do next
+          val nextToCheck = rest ++ children
+          val nextAll = all :+ (pom, next)
+          grabAllProjects(nextToCheck, nextAll)
+        case Nil => all
+      }
+    grabAllProjects(pom :: Nil)
+  }
+  
+  def getChildProjectPoms(pom: PomModel, pomFile: File): Seq[File] =
+    for {
+      childDirName <- Option(pom.getModules) map (_.asScala) getOrElse Nil
+      childPom = pomFile.getParentFile / childDirName / "pom.xml"
+      if childPom.exists
+    } yield childPom
+  
+  
+  // Load pom values into settings.
+  lazy val useMavenPom: Seq[Setting[_]] =
+    loadPomInSettings ++ pullSettingsFromPom
+  
+  def loadPomInSettings: Seq[Setting[_]]= Seq(
+    pomLocation <<= baseDirectory apply (_ / "pom.xml"),
+    mvnLocalRepository := defaultLocalRepo,
+    effectivePom <<= (pomLocation, mvnLocalRepository) apply loadEffectivePom
+  )
+  
   def pullSettingsFromPom: Seq[Setting[_]] = Seq(
     name <<= fromPom(_.getArtifactId),
     organization <<= fromPom(_.getGroupId),
     version <<= fromPom(_.getVersion),
-    // TODO - Add configuration on whetehr we force the scalaVersion to exist...
+    // TODO - Add configuration on whether we force the scalaVersion to exist...
     scalaVersion <<= fromPom(getScalaVersionForced),
     libraryDependencies <++= fromPom(getDependencies),
     resolvers <++= fromPom(getResolvers),
