@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.jsuereth.junk</groupId>
+  <artifactId>test-1</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>com.jsuereth</groupId>
+    <artifactId>test-parent</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  
+  <modules>
+    <module>test3</module>
+    <module>test4</module>
+  </modules>
+
+</project>
