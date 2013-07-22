@@ -55,19 +55,13 @@ object MavenProjectHelper {
       depMap.getOrElse(project, Nil)
     // Now, sort projects in an order that we can create them.
     val sorted: Seq[ProjectTree] =
-      projects sortWith { 
-        // Simples come first
-        case (_: AggregateProject, _: SimpleProject) => false
-        case (_: SimpleProject, _: AggregateProject) => true
-
-        // Less dependencies come first
-        case (l: SimpleProject, r: SimpleProject) => 
-          getDepsFor(l).size < getDepsFor(r).size
-
-        // For aggregates, we need the *lower in the filesystem* projects to come first
-        // This way parents can aggregate children reactors.
-        case (l: AggregateProject, r: AggregateProject) =>
-          l.dir.getAbsolutePath > r.dir.getAbsolutePath
+      Dag.topologicalSort(projects) { project =>
+        val aggregates = project match {
+          case AggregateProject(_,_,children) => children
+          case _ => Nil
+        }
+        val deps = getDepsFor(project)
+        aggregates ++ deps
       }
     def makeProjects(toMake: Seq[ProjectTree], made: Map[ProjectTree, Project] = Map.empty): Seq[Project] = 
       toMake match {
