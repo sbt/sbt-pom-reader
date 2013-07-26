@@ -28,9 +28,8 @@ object MavenProjectHelper {
     lazy val id: String =
       makeId(model.getGroupId, model.getArtifactId, model.getVersion)
       
-      
     def name: String = 
-      Option(model.getName) getOrElse model.getArtifactId
+     model.getArtifactId
       
     override def hashCode = id.hashCode
     override def toString = "Project("+id+")"
@@ -112,8 +111,9 @@ object MavenProjectHelper {
     makeProjects(sorted)
   }
   
+  // TODO - Can we  pick a better name and does this need scrubbed?
   def makeProjectName(pom: PomModel): String = 
-    Option(pom.getName) getOrElse pom.getArtifactId
+    pom.getArtifactId
     
   def makeProjectTree(pomFile: File): ProjectTree = {
     val pom = loadEffectivePom(pomFile)
