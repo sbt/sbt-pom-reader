@@ -1,0 +1,4 @@
+# Here, a compile should hit all the aggregate projects.
+> compile
+$ exists test1/target
+> test

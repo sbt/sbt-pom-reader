@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.jsuereth</groupId>
+  <artifactId>test-parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>test1</module>
+  </modules>
+  
+  <properties>
+    <scala.version>2.10.2</scala.version>
+    <scala.plugin.version>3.1.5</scala.plugin.version>
+  </properties>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>net.alchim31.maven</groupId>
+          <artifactId>scala-maven-plugin</artifactId>
+          <version>${scala.plugin.version}</version>
+          <configuration>
+            <!--  Here we just put a ton of options. -->
+            <recompileMode>incremental</recompileMode>
+            <useZincServer>true</useZincServer>
+            <args>
+              <arg>-target:jvm-1.6</arg>
+              <arg>-feature</arg>
+              <arg>-language:_</arg>
+              <arg>-deprecation</arg>
+              <arg>-unchecked</arg>
+              <arg>-optimise</arg>
+              <arg>-encoding</arg>
+              <arg>UTF-8</arg>
+              <arg>-Yclosure-elim</arg>
+              <arg>-Yinline</arg>
+              <arg>-Yinline-warnings</arg>
+            </args>
+            <javacArgs>
+              <javacArg>-source</javacArg>
+              <javacArg>1.6</javacArg>
+              <javacArg>-Xlint:-options</javacArg>
+              <javacArg>-deprecation</javacArg>
+              <javacArg>-target</javacArg>
+              <javacArg>1.6</javacArg>
+            </javacArgs>
+            <jvmArgs>
+              <jvmArg>-Xmx768m</jvmArg>
+              <jvmArg>-Xss10m</jvmArg>
+            </jvmArgs>
+            <scalaVersion>${scala.version}</scalaVersion>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.scalatest</groupId>
+          <artifactId>scalatest-maven-plugin</artifactId>
+          <version>1.0-M4-SNAP1</version>
+          <configuration>
+            <forkMode>once</forkMode>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <junitxml>.</junitxml>
+            <filereports>WDF TestSuite.txt</filereports>
+            <stdout>DS</stdout>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  
+  <dependencyManagement>
+    <dependencies>
+  	  <dependency>
+  	    <groupId>org.scala-lang</groupId>
+  	    <artifactId>scala-library</artifactId>
+  	    <version>2.10.2</version>
+  	  </dependency>
+  	  <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest_2.10</artifactId>
+        <version>2.0.M6-SNAP23</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>

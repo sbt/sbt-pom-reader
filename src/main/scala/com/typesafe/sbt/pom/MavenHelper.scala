@@ -30,7 +30,12 @@ object MavenHelper {
     organization <<= fromPom(_.getGroupId),
     version <<= fromPom(_.getVersion),
     // TODO - Add configuration on whether we force the scalaVersion to exist...
-    scalaVersion <<= fromPom(getScalaVersionForced),
+    scalaVersion <<= (effectivePom, scalaVersion, pomLocation) apply { (model, old, file) =>
+      getScalaVersion(model) getOrElse {
+        println("Unable to determine scala version in: " + file + ", using " + scalaVersion)
+        old
+      }
+    },
     libraryDependencies <++= fromPom(getDependencies),
     resolvers <++= fromPom(getResolvers),
     scalacOptions <++= (effectivePom) map { pom =>
