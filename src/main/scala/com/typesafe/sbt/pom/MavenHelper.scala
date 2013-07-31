@@ -22,8 +22,31 @@ object MavenHelper {
   def loadPomInSettings: Seq[Setting[_]]= Seq(
     pomLocation <<= baseDirectory apply (_ / "pom.xml"),
     mvnLocalRepository := defaultLocalRepo,
-    effectivePom <<= (pomLocation, mvnLocalRepository) apply loadEffectivePom
+    effectivePom <<= (pomLocation, mvnLocalRepository) apply loadEffectivePom,
+    showEffectivePom <<= (pomLocation, effectivePom, streams) map showPom
   )
+  
+
+  // We Synchronize on System.out so aggregate logs don't interleave....
+  def showPom(location: File, model: PomModel, s: TaskStreams): Unit = System.out.synchronized {
+    s.log.info("---- Effective pom ("+location+") ----")
+    serializePom(model).split("[\r\n]+") foreach { line =>
+      s.log.info(line)  
+    }
+  }
+  
+  def serializePom(pom: PomModel): String = {
+    val out = new java.io.StringWriter
+    val writer = new org.apache.maven.model.io.xpp3.MavenXpp3Writer
+    try writer.write(out, pom)
+    catch {
+      case e => 
+        e.printStackTrace
+        throw e
+    }
+    finally out.close()
+    out.getBuffer.toString
+  }
   
   def pullSettingsFromPom: Seq[Setting[_]] = Seq(
     name <<= fromPom(_.getArtifactId),

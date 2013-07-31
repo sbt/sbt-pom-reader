@@ -80,9 +80,7 @@ object MavenProjectHelper {
                 } yield depProject
               case _ => Nil
             }
-          println("Current project: " + current)
-          println("Dependencies: " + depProjects.mkString("\n\t", "\n\t",""))
-          println("Aggregates: " + aggregates.mkString("\n\t", "\n\t",""))
+          // TODO - Configure debugging output....
           val currentProject = (
               Project(makeProjectName(current.model),current.dir)
               // First pull in settings from pom
