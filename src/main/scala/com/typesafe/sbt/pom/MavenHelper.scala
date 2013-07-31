@@ -124,7 +124,14 @@ object MavenHelper {
         case Some(scope) => dep % scope
         case None => dep
       }
-    fixScope(dep.getGroupId % dep.getArtifactId % dep.getVersion)
+      
+    def addExclusions(mod: ModuleID): ModuleID = {
+      val exclusions = dep.getExclusions.asScala
+      exclusions.foldLeft(mod) { (mod, exclude) =>
+        mod.exclude(exclude.getGroupId, exclude.getArtifactId)
+      }
+    }
+    addExclusions(fixScope(dep.getGroupId % dep.getArtifactId % dep.getVersion))
   }
     
   def getDependencies(pom: PomModel): Seq[ModuleID] = {
