@@ -185,12 +185,11 @@ object MavenHelper {
   }
   
   
-  def getServerRealm(uri: String): String = {
+  def getServerRealmSafe(uri: String): Option[String] = {
     // We have to try both PUT and POST because of Nexus vs. Artifactory differences on when they
     // report authentication realm issues.
     getServerRealm("PUT", uri) orElse
-    getServerRealm("POST", uri) getOrElse 
-    sys.error("Unable to determine authentication realm for: " + uri)
+    getServerRealm("POST", uri)
   }
   
   def getHost(uri: String): String =
@@ -199,7 +198,8 @@ object MavenHelper {
   def makeSbtCredentials(creds: Seq[(PomRepository, ServerCredentials)]) =
     for {
       (repo, cred) <- creds
-      realm = getServerRealm(repo.getUrl)
+      // If we can't find the realm, just hack in the two we know most people use.
+      realm <- getServerRealmSafe(repo.getUrl).map(Nil.::).getOrElse(Seq("Artifactory Realm","Sonatype Nexus Repository Manager"))
       host = getHost(repo.getUrl)
     } yield Credentials(realm, host, cred.user, cred.pw)
     
