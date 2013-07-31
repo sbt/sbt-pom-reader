@@ -30,9 +30,15 @@ object MavenHelper {
     organization <<= fromPom(_.getGroupId),
     version <<= fromPom(_.getVersion),
     // TODO - Add configuration on whether we force the scalaVersion to exist...
-    scalaVersion <<= fromPom(getScalaVersionForced),
+    scalaVersion <<= (effectivePom, scalaVersion, pomLocation) apply { (model, old, file) =>
+      getScalaVersion(model) getOrElse {
+        println("Unable to determine scala version in: " + file + ", using " + scalaVersion)
+        old
+      }
+    },
     libraryDependencies <++= fromPom(getDependencies),
     resolvers <++= fromPom(getResolvers),
+    // TODO - split into Compile/Test/Runtime/Console
     scalacOptions <++= (effectivePom) map { pom =>
       getScalacOptions(pom)
     },
@@ -178,7 +184,7 @@ object MavenHelper {
     con setRequestMethod method
     if(con.getResponseCode == 401) {
       val authRealmConfigs = con.getHeaderField("WWW-Authenticate")
-      val BasicRealm = new scala.util.matching.Regex(""".*[Bb][Aa][Ss][Ii][Cc] [Rr][Ee][Aa][Ll][Mm]\=\"(.*)\".*""")
+      val BasicRealm = new scala.util.matching.Regex(""".*[Bb][Aa][Ss][Ii][Cc]\s+[Rr][Ee][Aa][Ll][Mm]\=\"(.*)\".*""")
       // Artifactory appears not to ask for authentication realm,but nexus does immediately.
       BasicRealm.unapplySeq(authRealmConfigs) flatMap (_.headOption)
     } else None

@@ -8,6 +8,9 @@ publishMavenStyle := false
 
 libraryDependencies ++= Dependencies.pluginDependencies
 
+git.baseVersion := "1.0"
+
+versionWithGit
 
 scriptedLaunchOpts <+= version apply { v => "-Dproject.version="+v }
 
@@ -22,3 +25,9 @@ initialCommands :=
 scriptedSettings
 
 scriptedLaunchOpts <+= version apply { v => "-Dproject.version="+v }
+
+publishTo <<= (version) { v =>
+  def scalasbt(repo: String) = ("scalasbt " + repo, "http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-" + repo)
+  val (name, repo) = if (v.endsWith("-SNAPSHOT")) scalasbt("snapshots") else scalasbt("releases")
+  Some(Resolver.url(name, url(repo))(Resolver.ivyStylePatterns))
+}
