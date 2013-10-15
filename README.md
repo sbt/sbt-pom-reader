@@ -51,10 +51,15 @@ indirectly reference them in sbt settings, like so:
 
 `build.sbt`:
 ```
-val someSubProject = ProjectReference(....)
+// This is a heuristic, assuming we're running sbt in the same directory as the build.
+val buildLocation = (file(".").getAbsoluteFile.getParentFile)
 
-// Disable all scalac arguemnts when running the REPL
-scalacOptions in someSubProject in Compile in console := Seq.empty
+// Here we define a reference to a subproject.  The string "subproject" refers to the artifact id of
+// the subproject.
+val subproject = ProjectRef(buildLoc, "subproject")
+
+// Disable all scalac arguemnts when running the REPL.
+scalacOptions in subproject in Compile in console := Seq.empty
 ```
 
 # Contributing
