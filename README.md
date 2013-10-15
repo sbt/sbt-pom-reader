@@ -10,17 +10,56 @@ This project aims to read maven pom files and configure sbt appropriately.  We h
 6. Multi-module builds should work assuming each project meets an above caveat (at least, once we implement support).
 
 
-The only config you should require in your `build.sbt` for a simple maven project is:
+# Usage
 
-    useMavenPom
+You want you project directory to look like the following:
 
-The only thing you should require for a reactor maven project is in your `project/builds.scala`:
+```
+<my-maven-project>/
+  pom.xml                  <- Your maven build.
+  project/
+     build.properties      <- the sbt version specification
+     build.scala           <- the sbt build definition
+     plugins.sbt           <- the sbt plugin configuratoin
+
+  ..                       <- Whatever files are normally in your maven proejct.
+
+```
+
+Each of the files should have the following contents.
+
+`project/build.properties`:
+
+    sbt.version=0.13.0
+
+`project/build.scala`:
 
     import sbt._
     object MyBuild extends com.typesafe.sbt.pom.PomBuild
 
+`project/plugins.sbt`:
 
-Please feel free to contribute example/test maven projects you'd like to be able to load in sbt.
+     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "1.0")
+     
+
+## Configuring projects
+
+If the pom-reader plugin doesn't have a 100% mapping from your maven build into sbt (i.e. there is some kind 
+of configuration you wish to perform, then you will need to add specific configuration items.  Since the
+plugin is automatically generating the sub-projects based on your maven configuration, you'll have to
+indirectly reference them in sbt settings, like so:
+
+`build.sbt`:
+```
+val someSubProject = ProjectReference(....)
+
+// Disable all scalac arguemnts when running the REPL
+scalacOptions in someSubProject in Compile in console := Seq.empty
+```
+
+# Contributing
+
+Please feel free to contribute example/test maven projects you'd like to be able to load in sbt.  
 
 
 # Licensing
