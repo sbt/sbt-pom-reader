@@ -110,8 +110,10 @@ object MavenProjectHelper {
   }
   
   // TODO - Can we  pick a better name and does this need scrubbed?
-  def makeProjectName(pom: PomModel): String = 
-    pom.getArtifactId
+  def makeProjectName(pom: PomModel): String = {
+    val directoryName = pom.getPomFile.getParentFile.getName
+    directoryName
+  }
     
   def makeProjectTree(pomFile: File): ProjectTree = {
     val pom = loadEffectivePom(pomFile)
