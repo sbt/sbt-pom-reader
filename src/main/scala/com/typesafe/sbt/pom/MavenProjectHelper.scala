@@ -42,7 +42,7 @@ object MavenProjectHelper {
   case class AggregateProject(model: PomModel, dir: File, children: Seq[ProjectTree]) extends ProjectTree
   case class SimpleProject(model: PomModel, dir: File) extends ProjectTree
   
-  def makeReactorProject(baseDir: File): Seq[Project] = {
+  def makeReactorProject(baseDir: File, overrideRootProjectName:Option[String] = None): Seq[Project] = {
     // First create a tree of how things aggregate.
     val tree = makeProjectTree(baseDir / "pom.xml")
     // Next flatten the list of all projects.
@@ -82,7 +82,7 @@ object MavenProjectHelper {
             }
           // TODO - Configure debugging output....
           val currentProject = (
-              Project(makeProjectName(current.model),current.dir)
+              Project(makeProjectName(current.model,overrideRootProjectName),current.dir)
               // First pull in settings from pom
               settings(useMavenPom:_*)
               // Now update depends on relationships
@@ -110,8 +110,8 @@ object MavenProjectHelper {
   }
   
   // TODO - Can we  pick a better name and does this need scrubbed?
-  def makeProjectName(pom: PomModel): String = {
-    val directoryName = pom.getPomFile.getParentFile.getName
+  def makeProjectName(pom: PomModel, overrideName: Option[String]): String = {
+    val directoryName = overrideName.getOrElse(pom.getPomFile.getParentFile.getName)
     directoryName
   }
     
