@@ -111,8 +111,9 @@ object MavenProjectHelper {
   
   // TODO - Can we  pick a better name and does this need scrubbed?
   def makeProjectName(pom: PomModel, overrideName: Option[String]): String = {
-    val directoryName = overrideName.getOrElse(pom.getPomFile.getParentFile.getName)
-    directoryName
+    val pomName = Option(pom.getProperties.get("sbt.project.name").asInstanceOf[String])
+    val directoryName = pom.getPomFile.getParentFile.getName
+    overrideName.getOrElse(pomName.getOrElse(directoryName))
   }
     
   def makeProjectTree(pomFile: File): ProjectTree = {
