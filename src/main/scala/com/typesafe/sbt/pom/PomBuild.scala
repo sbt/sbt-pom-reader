@@ -16,7 +16,7 @@ trait PomBuild extends Build {
   override def projectDefinitions(baseDirectory: File): Seq[Project] = {
     // If we detect a maven parent pom, use it.
     if((baseDirectory / "pom.xml").exists)
-      MavenProjectHelper.makeReactorProject(baseDirectory,overrideRootProjectName)
+      MavenProjectHelper.makeReactorProject(baseDirectory,overrideRootProjectName, Seq()) // This isn't the effective pom
     else super.projectDefinitions(baseDirectory)
   }
 }
