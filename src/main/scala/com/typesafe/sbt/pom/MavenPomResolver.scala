@@ -39,10 +39,10 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
        system,
        repositories = defaultRepositories
      )
-     
    }
    
-   def loadEffectivePom(pomFile: File, repositories: Seq[RemoteRepository]): Model =
+   def loadEffectivePom(pomFile: File, repositories: Seq[RemoteRepository],
+       activeProfiles: Seq[String]): Model =
      try {
        val request = new DefaultModelBuildingRequest
        request setLocationTracking true
@@ -52,12 +52,13 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
        // TODO - Pass as arguments?
        request setSystemProperties systemProperties
        request setUserProperties userProperties
-       // TODO - profiles?
+       request setActiveProfileIds activeProfiles.asJava
        // TODO - Model resolver?
        request setModelResolver modelResolver
+
        (modelBuilder build request).getEffectiveModel
      } catch {
-       case e: ModelBuildingException => 
+       case e: ModelBuildingException =>
          // TODO - Wrap in better exception...
          throw e
      }

@@ -37,6 +37,6 @@ package object pom {
     (file(sys.props("user.home")) / ".m2" / "repository")
   }
   
-  def loadEffectivePom(pom: File, localRepo: File = defaultLocalRepo) = 
-    MvnPomResolver(localRepo).loadEffectivePom(pom, Seq.empty)
+  def loadEffectivePom(pom: File, localRepo: File = defaultLocalRepo, profiles: Seq[String]) =
+    MvnPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles)
 }

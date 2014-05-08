@@ -22,7 +22,7 @@ object MavenHelper {
   def loadPomInSettings: Seq[Setting[_]]= Seq(
     pomLocation <<= baseDirectory apply (_ / "pom.xml"),
     mvnLocalRepository := defaultLocalRepo,
-    effectivePom <<= (pomLocation, mvnLocalRepository) apply loadEffectivePom,
+    effectivePom <<= (pomLocation, mvnLocalRepository, profiles) apply loadEffectivePom,
     showEffectivePom <<= (pomLocation, effectivePom, streams) map showPom
   )
   
@@ -40,7 +40,7 @@ object MavenHelper {
     val writer = new org.apache.maven.model.io.xpp3.MavenXpp3Writer
     try writer.write(out, pom)
     catch {
-      case e => 
+      case e: Throwable =>
         e.printStackTrace
         throw e
     }
