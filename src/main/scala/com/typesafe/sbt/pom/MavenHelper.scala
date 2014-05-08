@@ -59,6 +59,15 @@ object MavenHelper {
         old
       }
     },
+
+    unmanagedSourceDirectories in Compile <++= (effectivePom,  baseDirectory) apply { (pom, base) =>
+      getAdditionalSourcesFromPlugin(pom).filterNot(_.contains("test")).map(x => base / x)
+    },
+
+    unmanagedSourceDirectories in Test <++= (effectivePom,  baseDirectory) apply { (pom, base) =>
+      getAdditionalSourcesFromPlugin(pom).filter(_.contains("test")).map(x => base / x)
+    },
+
     libraryDependencies <++= fromPom(getDependencies),
     resolvers <++= fromPom(getResolvers),
     // TODO - split into Compile/Test/Runtime/Console
@@ -93,6 +102,30 @@ object MavenHelper {
       (plugin.getArtifactId == scalaMavenPluginId)
     }
   }
+
+  def getAdditionalSourcesPlugin(pom: PomModel): Seq[PomPlugin] = {
+    pom.getBuild.getPlugins.asScala filter { plugin =>
+      (plugin.getGroupId == "org.codehaus.mojo") &&
+        (plugin.getArtifactId == "build-helper-maven-plugin")
+    }
+  }
+
+  def getAdditionalSourcesFromPlugin(pom: PomModel): Seq[String] = {
+    val additionalSources = for {
+      plugin <- getAdditionalSourcesPlugin(pom) // TODO: Support more plugins
+      config <- plugin.getExecutions.iterator.asScala.map(_.getConfiguration)
+      sources <- readAdditionalSourcesPlugin(config)
+    } yield sources
+    additionalSources.flatten.toSeq.
+      filterNot(x => x.trim == "src/main/scala" || x.trim == "src/test/scala")
+  }
+
+  def readAdditionalSourcesPlugin(config: java.lang.Object): Option[Seq[String]] =
+    for {
+      dom <- domOrNone(config)
+      srcs <- Option(dom getChild "sources")
+    } yield srcs.getChildren map (_.getValue)
+
   def domOrNone(config: java.lang.Object): Option[org.codehaus.plexus.util.xml.Xpp3Dom] = 
    if(config.isInstanceOf[org.codehaus.plexus.util.xml.Xpp3Dom]) {
      Some(config.asInstanceOf[org.codehaus.plexus.util.xml.Xpp3Dom])
@@ -115,7 +148,7 @@ object MavenHelper {
        dom <- domOrNone(config)
        args <- Option(dom getChild "args")
      } yield  args.getChildren map (_.getValue)
-     
+
   def getScalacOptions(pom: PomModel): Seq[String] = {
     val discovered =
       for {
@@ -247,8 +280,9 @@ object MavenHelper {
     val matched = matchCredentialsWithServers(serverConfig, pom)
     makeSbtCredentials(matched)
   }
-  // TODO - Pull source/resource directories from pom...
   
+  // TODO - Pull resource directories from pom...
+
   // TODO - compiler plugins...
   
 }
