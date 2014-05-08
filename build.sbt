@@ -8,9 +8,7 @@ publishMavenStyle := false
 
 libraryDependencies ++= Dependencies.pluginDependencies
 
-git.baseVersion := "1.0"
-
-versionWithGit
+version := "1.0.3"
 
 scriptedLaunchOpts <+= version apply { v => "-Dproject.version="+v }
 

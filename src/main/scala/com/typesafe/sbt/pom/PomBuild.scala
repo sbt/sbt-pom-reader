@@ -11,12 +11,13 @@ import Project.Initialize
 trait PomBuild extends Build {
   import SbtPomKeys._
   import MavenHelper._
+  val profiles: Seq[String] = Seq()
 
   lazy val overrideRootProjectName:Option[String] = None
   override def projectDefinitions(baseDirectory: File): Seq[Project] = {
     // If we detect a maven parent pom, use it.
     if((baseDirectory / "pom.xml").exists)
-      MavenProjectHelper.makeReactorProject(baseDirectory,overrideRootProjectName)
+      MavenProjectHelper.makeReactorProject(baseDirectory, overrideRootProjectName, profiles) // This isn't the effective pom
     else super.projectDefinitions(baseDirectory)
   }
 }
