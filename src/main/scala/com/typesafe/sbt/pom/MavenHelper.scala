@@ -175,10 +175,12 @@ object MavenHelper {
   // TODO - Pull credentials from ~/.m2/settings.xml
   def settingsFile = file(sys.props("user.home")) / ".m2" / "settings.xml"
   
-  def settingsXml: scala.xml.Node =
+  def settingsXml: scala.xml.Node = if (settingsFile.exists)
     sbt.Using.fileInputStream(settingsFile) { in =>
       scala.xml.XML.load(in)
-    }
+    } else
+    <settings> </settings>
+
   case class ServerCredentials(id: String, user: String, pw: String)
   def parseServersFromSettings(xml: scala.xml.Node): Seq[ServerCredentials] = {
     val servers = xml \ "servers" \\ "server"
