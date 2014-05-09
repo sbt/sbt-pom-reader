@@ -174,11 +174,19 @@ object MavenHelper {
       for {
         scope <- Option(dep.getScope)
       } yield scope
-      
+
+    val typeString: Option[String] =
+      for {
+        typeStr <- Option(dep.getType.trim)
+        if typeStr == "test-jar"
+      } yield typeStr
+
     def fixScope(dep: ModuleID): ModuleID =
-      scopeString match {
-        case Some(scope) => dep % scope
-        case None => dep
+      (scopeString, typeString) match {
+        case (Some(scope), None) => dep % scope
+        case (Some(scope), Some("test-jar")) => dep % scope classifier "tests"
+        case (None, Some("test-jar")) => dep classifier "tests"
+        case _ => dep
       }
       
     def addExclusions(mod: ModuleID): ModuleID = {
