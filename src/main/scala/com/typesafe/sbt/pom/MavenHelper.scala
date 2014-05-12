@@ -68,6 +68,11 @@ object MavenHelper {
       getAdditionalSourcesFromPlugin(pom).filter(_.contains("test")).map(x => base / x)
     },
 
+    publishArtifact in (Test, packageBin) <<= effectivePom apply { pom =>
+      isPublishingTestArtifactRequired(pom)
+
+    },
+
     libraryDependencies <++= fromPom(getDependencies),
     resolvers <++= fromPom(getResolvers),
     // TODO - split into Compile/Test/Runtime/Console
@@ -126,6 +131,21 @@ object MavenHelper {
       srcs <- Option(dom getChild "sources")
     } yield srcs.getChildren map (_.getValue)
 
+  def getJarPlugin(pom: PomModel): Seq[PomPlugin] = {
+    pom.getBuild.getPlugins.asScala filter { plugin =>
+      (plugin.getGroupId == "org.apache.maven.plugins") &&
+        (plugin.getArtifactId == "maven-jar-plugin")
+    }
+  }
+
+  def isPublishingTestArtifactRequired(pom: PomModel): Boolean = {
+    val t = for {
+      plugin <- getJarPlugin(pom)
+      testJar = plugin.getExecutions.asScala.exists(_.getGoals.asScala.exists(_.contains("test-jar")))
+    } yield testJar
+    t.exists(_ == true)
+  }
+
   def domOrNone(config: java.lang.Object): Option[org.codehaus.plexus.util.xml.Xpp3Dom] = 
    if(config.isInstanceOf[org.codehaus.plexus.util.xml.Xpp3Dom]) {
      Some(config.asInstanceOf[org.codehaus.plexus.util.xml.Xpp3Dom])
@@ -136,6 +156,7 @@ object MavenHelper {
       dom <- domOrNone(config)
       child <- Option(dom.getChild(elem))
     } yield child.getValue
+
   def getScalaVersionFromPlugins(pom: PomModel): Option[String] =
     for {
       plugin <- getScalaPlugin(pom)
@@ -174,11 +195,18 @@ object MavenHelper {
       for {
         scope <- Option(dep.getScope)
       } yield scope
-      
+
+    val typeString: Option[String] =
+      for {
+        typeStr <- Option(dep.getType)
+        if typeStr == "test-jar"
+      } yield typeStr
+
     def fixScope(dep: ModuleID): ModuleID =
-      scopeString match {
-        case Some(scope) => dep % scope
-        case None => dep
+      (scopeString, typeString) match {
+        case (Some(scope), None) => dep % scope
+        case (Some(scope), Some("test-jar")) => dep % "test->test"
+        case _ => dep
       }
       
     def addExclusions(mod: ModuleID): ModuleID = {
