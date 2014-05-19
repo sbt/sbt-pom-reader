@@ -42,8 +42,10 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
    }
    
    def loadEffectivePom(pomFile: File, repositories: Seq[RemoteRepository],
-       activeProfiles: Seq[String]): Model =
+       activeProfiles: Seq[String], userPropsMap: Map[String, String]): Model =
      try {
+       val userProperties = new java.util.Properties()
+       userProperties.putAll(userPropsMap.asJava)
        val request = new DefaultModelBuildingRequest
        request setLocationTracking true
        request setProcessPlugins false
@@ -62,8 +64,6 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
          // TODO - Wrap in better exception...
          throw e
      }
-   // TODO - Allow these to be specified...
-   val userProperties = new java.util.Properties
    
    lazy val systemProperties = {
      val props = new java.util.Properties
