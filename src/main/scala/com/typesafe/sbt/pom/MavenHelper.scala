@@ -175,10 +175,10 @@ object MavenHelper {
         scope <- Option(dep.getScope)
       } yield scope
       
-    def fixScope(dep: ModuleID): ModuleID =
+    def fixScope(m: ModuleID): ModuleID =
       scopeString match {
-        case Some(scope) => dep % scope
-        case None => dep
+        case Some(scope) => m % scope
+        case None => m
       }
       
     def addExclusions(mod: ModuleID): ModuleID = {
@@ -187,7 +187,13 @@ object MavenHelper {
         mod.exclude(exclude.getGroupId, exclude.getArtifactId)
       }
     }
-    addExclusions(fixScope(dep.getGroupId % dep.getArtifactId % dep.getVersion))
+    def addClassifier(mod: ModuleID): ModuleID = {
+      Option(dep.getClassifier) match {
+        case Some(_classifier) => mod classifier _classifier
+        case None => mod
+      }
+    }
+    addExclusions(addClassifier(fixScope(dep.getGroupId % dep.getArtifactId % dep.getVersion)))
   }
     
   def getDependencies(pom: PomModel): Seq[ModuleID] = {
