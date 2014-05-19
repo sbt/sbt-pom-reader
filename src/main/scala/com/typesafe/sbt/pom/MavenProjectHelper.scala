@@ -43,9 +43,9 @@ object MavenProjectHelper {
   case class SimpleProject(model: PomModel, dir: File) extends ProjectTree
   
   def makeReactorProject(baseDir: File, overrideRootProjectName:Option[String] = None,
-                         profiles: Seq[String]): Seq[Project] = {
+                         profiles: Seq[String], userProps: Map[String, String]): Seq[Project] = {
     // First create a tree of how things aggregate.
-    val tree = makeProjectTree(baseDir / "pom.xml", profiles)
+    val tree = makeProjectTree(baseDir / "pom.xml", profiles, userProps)
     // Next flatten the list of all projects.
     val projects = allProjectsInTree(tree)
     // Create a mapping of all dependencies between projects.
@@ -117,9 +117,9 @@ object MavenProjectHelper {
     overrideName.getOrElse(pomName.getOrElse(directoryName))
   }
     
-  def makeProjectTree(pomFile: File, profiles: Seq[String]): ProjectTree = {
-    val pom = loadEffectivePom(pomFile, profiles = profiles)
-    val children = getChildProjectPoms(pom, pomFile) map (makeProjectTree(_, profiles))
+  def makeProjectTree(pomFile: File, profiles: Seq[String], userProps: Map[String, String]): ProjectTree = {
+    val pom = loadEffectivePom(pomFile, profiles = profiles, userProps = userProps)
+    val children = getChildProjectPoms(pom, pomFile) map (makeProjectTree(_, profiles, userProps))
     if(children.isEmpty) SimpleProject(pom, pomFile.getParentFile)
     else AggregateProject(pom, pomFile.getParentFile, children)
   }
