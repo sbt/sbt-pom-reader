@@ -47,9 +47,15 @@ object MavenHelper {
     finally out.close()
     out.getBuffer.toString
   }
-  
+  val ExtractIdRegex = """(.*)_2.\d+.*""".r
+  def removeBinaryVersionSuffix(v: String): String = v match {
+    case ExtractIdRegex(a) => a
+    case _ => v
+  }
+
   def pullSettingsFromPom: Seq[Setting[_]] = Seq(
-    name <<= fromPom(_.getArtifactId),
+    /* Often poms have artifactId with binary version suffix. This should ideally be removed. */
+    name <<= fromPom(x => removeBinaryVersionSuffix(x.getArtifactId)),
     organization <<= fromPom(_.getGroupId),
     version <<= fromPom(_.getVersion),
     // TODO - Add configuration on whether we force the scalaVersion to exist...
