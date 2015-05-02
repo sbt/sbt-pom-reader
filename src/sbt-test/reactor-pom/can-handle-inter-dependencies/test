@@ -1,5 +1,5 @@
 # Here, a compile should hit all the dependent projects.
 # Also, we have an explicit dependency so compilation should fail if this doesn't work.
-> test-2/compile
+> test2/compile
 $ exists test2/target
 $ exists test1/test3/target

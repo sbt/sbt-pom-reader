@@ -1,4 +1,4 @@
-> test-1/compile
+> test1/compile
 $ exists test1/target
-> test-2/compile
+> test2/compile
 $ exists test2/target
