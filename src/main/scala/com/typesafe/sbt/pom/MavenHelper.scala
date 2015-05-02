@@ -22,6 +22,8 @@ object MavenHelper {
   def loadPomInSettings: Seq[Setting[_]]= Seq(
     pomLocation <<= baseDirectory apply (_ / "pom.xml"),
     mvnLocalRepository := defaultLocalRepo,
+    profiles := Seq.empty,
+    mavenUserProperties := Map.empty,
     effectivePom <<= (pomLocation, mvnLocalRepository, profiles, mavenUserProperties) apply loadEffectivePom,
     showEffectivePom <<= (pomLocation, effectivePom, streams) map showPom
   )
