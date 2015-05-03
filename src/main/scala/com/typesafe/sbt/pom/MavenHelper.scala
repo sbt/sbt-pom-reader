@@ -11,7 +11,9 @@ import org.apache.maven.model.{
 import Project.Initialize
 import SbtPomKeys._
 import collection.JavaConverters._
+import MavenUserSettingsHelper._
 
+import scala.util.Try
 /** Helper object to extract maven settings. */
 object MavenHelper {
   
@@ -125,7 +127,8 @@ object MavenHelper {
       config <- plugin.getExecutions.iterator.asScala.map(_.getConfiguration)
       sources <- readAdditionalSourcesPlugin(config)
     } yield sources
-    additionalSources.flatten.toSeq.
+    // `asInstanceOf` bit is to help the presentation compiler along...
+    additionalSources.flatten.asInstanceOf[Seq[String]].
       filterNot(x => x.trim == "src/main/scala" || x.trim == "src/test/scala")
   }
 
@@ -219,55 +222,26 @@ object MavenHelper {
     } yield repo.getId at repo.getUrl
   }
 
-  def settingsXml(settingsFile: File): scala.xml.Node = if (settingsFile.exists)
-    sbt.Using.fileInputStream(settingsFile) { in =>
-      scala.xml.XML.load(in)
-    } else
-    <settings> </settings>
 
-  case class ServerCredentials(id: String, user: String, pw: String)
-  def parseServersFromSettings(xml: scala.xml.Node): Seq[ServerCredentials] = {
-    val servers = xml \ "servers" \\ "server"
-    // TODO - Support alternative layouts here...
-    val result = 
-      for(server <- servers) yield {
-        val id = (server \ "id").text
-        val user = (server \ "username").text
-        val pw = (server \ "password").text
-        ServerCredentials(id, user, pw)
-      }
-    result filterNot { x =>
-      x.user.isEmpty || x.pw.isEmpty  
-    }
-  }
-
-  def settingsXmlServers(settingsFile: File): Seq[ServerCredentials] =
-    parseServersFromSettings(settingsXml(settingsFile))
   
-  // TODO - Grab authentication realm...
-  def matchCredentialsWithServers(creds: Seq[ServerCredentials], pom: PomModel): Seq[(PomRepository, ServerCredentials)] = {
-    for {
-      repo <- pom.getRepositories.asScala
-      cred <- creds
-      if cred.id == repo.getId
-    } yield (repo -> cred)
-  }
-  
-  
-  // Attempts to perform an unathorized action so we can detect the supported
-  // authentication realms of our server.  tested against nexus + artifactory.
+  /** Attempts to perform an unathorized action so we can detect the supported
+    * authentication realms of our server.  tested against nexus + artifactory. */
   def getServerRealm(method: String, uri: String): Option[String] = {
-    val con = url(uri).openConnection.asInstanceOf[java.net.HttpURLConnection]
-    con setRequestMethod method
-    if(con.getResponseCode == 401) {
-      val authRealmConfigs = con.getHeaderField("WWW-Authenticate")
-      val BasicRealm = new scala.util.matching.Regex(""".*[Bb][Aa][Ss][Ii][Cc]\s+[Rr][Ee][Aa][Ll][Mm]\=\"(.*)\".*""")
-      // Artifactory appears not to ask for authentication realm,but nexus does immediately.
-      BasicRealm.unapplySeq(authRealmConfigs) flatMap (_.headOption)
-    } else None
+    // This is consigned to a Try until proper handling of offline mode.
+    Try {
+      val con = url(uri).openConnection.asInstanceOf[java.net.HttpURLConnection]
+      con setRequestMethod method
+      if (con.getResponseCode == 401) {
+        val authRealmConfigs = con.getHeaderField("WWW-Authenticate")
+        val BasicRealm = new scala.util.matching.Regex(
+          """.*[Bb][Aa][Ss][Ii][Cc]\s+[Rr][Ee][Aa][Ll][Mm]\=\"(.*)\".*""")
+        // Artifactory appears not to ask for authentication realm,but nexus does immediately.
+        BasicRealm.unapplySeq(authRealmConfigs) flatMap (_.headOption)
+      }
+      else None
+    } getOrElse(None)
   }
-  
-  
+
   def getServerRealmSafe(uri: String): Option[String] = {
     // We have to try both PUT and POST because of Nexus vs. Artifactory differences on when they
     // report authentication realm issues.
@@ -288,7 +262,7 @@ object MavenHelper {
     
     
   def createSbtCredentialsFromSettingsXml(pom: PomModel, settingsFile: File): Seq[Credentials] = {
-    val serverConfig = settingsXmlServers(settingsFile)
+    val serverConfig = serverCredentials(settingsFile)
     val matched = matchCredentialsWithServers(serverConfig, pom)
     makeSbtCredentials(matched)
   }
