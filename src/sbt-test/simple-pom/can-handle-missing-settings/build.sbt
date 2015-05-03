@@ -4,7 +4,7 @@ useMavenPom
 
 settingsLocation := baseDirectory.value / "non-existent-file.xml"
 
-TaskKey[Unit]("check-settings") <<= state map { s =>
+TaskKey[Unit]("check-settings") <<= (state, baseDirectory) map { (s, basedir) =>
   val extracted = Project extract s
   def testSetting[T](key: SettingKey[T], expected: T): Unit = {
     val found = extracted get key
@@ -19,4 +19,7 @@ TaskKey[Unit]("check-settings") <<= state map { s =>
   testSetting(version, "1.0-SNAPSHOT")
   testSetting(scalaVersion, "2.10.2")
   testSetting(organization, "com.jsuereth.junk")
+  val expectedFile = basedir / "non-existent-file.xml"
+  testSetting(settingsLocation, expectedFile)
+  assert(!expectedFile.exists(), "File can't exist if I'm to test handling non-existence. Please delete " + expectedFile)
 }
