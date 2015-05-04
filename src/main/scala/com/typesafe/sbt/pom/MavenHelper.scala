@@ -21,7 +21,10 @@ object MavenHelper {
   
   def loadPomInSettings: Seq[Setting[_]]= Seq(
     pomLocation <<= baseDirectory apply (_ / "pom.xml"),
+    settingsLocation := file(sys.props("user.home")) / ".m2" / "settings.xml",
     mvnLocalRepository := defaultLocalRepo,
+    profiles := Seq.empty,
+    mavenUserProperties := Map.empty,
     effectivePom <<= (pomLocation, mvnLocalRepository, profiles, mavenUserProperties) apply loadEffectivePom,
     showEffectivePom <<= (pomLocation, effectivePom, streams) map showPom
   )
@@ -80,7 +83,7 @@ object MavenHelper {
     scalacOptions <++= (effectivePom) map { pom =>
       getScalacOptions(pom)
     },
-    credentials <++= effectivePom map createSbtCredentialsFromSettingsXml
+    credentials <++= (effectivePom, settingsLocation) map createSbtCredentialsFromSettingsXml
   )
   
   def fromPom[T](f: PomModel => T): Initialize[T] =
@@ -216,11 +219,7 @@ object MavenHelper {
     } yield repo.getId at repo.getUrl
   }
 
-  
-  // TODO - Pull credentials from ~/.m2/settings.xml
-  def settingsFile = file(sys.props("user.home")) / ".m2" / "settings.xml"
-  
-  def settingsXml: scala.xml.Node = if (settingsFile.exists)
+  def settingsXml(settingsFile: File): scala.xml.Node = if (settingsFile.exists)
     sbt.Using.fileInputStream(settingsFile) { in =>
       scala.xml.XML.load(in)
     } else
@@ -241,8 +240,9 @@ object MavenHelper {
       x.user.isEmpty || x.pw.isEmpty  
     }
   }
-  def settingsXmlServers: Seq[ServerCredentials] = 
-    parseServersFromSettings(settingsXml)
+
+  def settingsXmlServers(settingsFile: File): Seq[ServerCredentials] =
+    parseServersFromSettings(settingsXml(settingsFile))
   
   // TODO - Grab authentication realm...
   def matchCredentialsWithServers(creds: Seq[ServerCredentials], pom: PomModel): Seq[(PomRepository, ServerCredentials)] = {
@@ -287,8 +287,8 @@ object MavenHelper {
     } yield Credentials(realm, host, cred.user, cred.pw)
     
     
-  def createSbtCredentialsFromSettingsXml(pom: PomModel): Seq[Credentials] = {
-    val serverConfig = settingsXmlServers
+  def createSbtCredentialsFromSettingsXml(pom: PomModel, settingsFile: File): Seq[Credentials] = {
+    val serverConfig = settingsXmlServers(settingsFile)
     val matched = matchCredentialsWithServers(serverConfig, pom)
     makeSbtCredentials(matched)
   }
