@@ -8,6 +8,7 @@ import org.apache.maven.model.{
   Dependency => PomDependency,
   Repository => PomRepository
 }
+import org.apache.maven.settings.{Settings ⇒ MavenSettings}
 import Project.Initialize
 import SbtPomKeys._
 import collection.JavaConverters._
@@ -28,6 +29,7 @@ object MavenHelper {
     profiles := Seq.empty,
     mavenUserProperties := Map.empty,
     effectivePom <<= (pomLocation, mvnLocalRepository, profiles, mavenUserProperties) apply loadEffectivePom,
+    effectiveSettings <<= (settingsLocation, profiles) apply loadUserSettings,
     showEffectivePom <<= (pomLocation, effectivePom, streams) map showPom
   )
   
@@ -80,12 +82,16 @@ object MavenHelper {
     },
 
     libraryDependencies <++= fromPom(getDependencies),
-    resolvers <++= fromPom(getResolvers),
+    resolvers <++= (effectivePom, effectiveSettings) apply { (pom, settings) ⇒
+      val pr = getPomResolvers(pom)
+      val sr = settings.map(getUserResolvers).getOrElse(Seq.empty)
+      pr ++ sr
+    },
     // TODO - split into Compile/Test/Runtime/Console
     scalacOptions <++= (effectivePom) map { pom =>
       getScalacOptions(pom)
     },
-    credentials <++= (effectivePom, settingsLocation) map createSbtCredentialsFromSettingsXml
+    credentials <++= (effectivePom, effectiveSettings) map createSbtCredentialsFromUserSettings
   )
   
   def fromPom[T](f: PomModel => T): Initialize[T] =
@@ -214,7 +220,7 @@ object MavenHelper {
     } yield convertDep(dep)
   }
    
-  def getResolvers(pom: PomModel): Seq[Resolver] = {
+  def getPomResolvers(pom: PomModel): Seq[Resolver] = {
     for {
       repo <- pom.getRepositories.asScala
       // TODO - Support other layouts
@@ -222,8 +228,6 @@ object MavenHelper {
     } yield repo.getId at repo.getUrl
   }
 
-
-  
   /** Attempts to perform an unathorized action so we can detect the supported
     * authentication realms of our server.  tested against nexus + artifactory. */
   def getServerRealm(method: String, uri: String): Option[String] = {
@@ -261,11 +265,13 @@ object MavenHelper {
     } yield Credentials(realm, host, cred.user, cred.pw)
     
     
-  def createSbtCredentialsFromSettingsXml(pom: PomModel, settingsFile: File): Seq[Credentials] = {
-    val serverConfig = serverCredentials(settingsFile)
-    val matched = matchCredentialsWithServers(serverConfig, pom)
-    makeSbtCredentials(matched)
-  }
+  def createSbtCredentialsFromUserSettings(pom: PomModel, effectiveSettings: Option[MavenSettings]): Seq[Credentials] = {
+    for {
+      settings ← effectiveSettings
+      creds = serverCredentials(settings)
+      matched = matchCredentialsWithServers(creds, pom)
+    } yield makeSbtCredentials(matched)
+  } getOrElse(Seq.empty)
   
   // TODO - Pull resource directories from pom...
 
