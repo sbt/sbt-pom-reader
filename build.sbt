@@ -2,32 +2,22 @@ name := "sbt-pom-reader"
 
 organization := "com.typesafe.sbt"
 
-sbtPlugin := true
+licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))
 
-publishMavenStyle := false
+sbtPlugin := true
 
 libraryDependencies ++= Dependencies.pluginDependencies
 
-git.baseVersion := "1.0"
-
-versionWithGit
-
-scriptedLaunchOpts <+= version apply { v => "-Dproject.version="+v }
-
-initialCommands :=
+initialCommands in console :=
   """| import com.typesafe.sbt.pom._
      | import sbt._
      | val localRepo = file(sys.props("user.home")) / ".m2" / "repository"
-     | val pom = loadEffectivePom(localRepo, file("src/sbt-test/simple-pom/can-extract-basics/pom.xml"))
+     | val pomFile = file("src/sbt-test/simple-pom/can-extract-basics/pom.xml")
+     | val pom = loadEffectivePom(pomFile, localRepo, Seq.empty, Map.empty)
      |""".stripMargin
 
 
 scriptedSettings
 
-scriptedLaunchOpts <+= version apply { v => "-Dproject.version="+v }
+scriptedLaunchOpts <+= version apply { v => "-Dproject.version=" + v }
 
-publishTo <<= (version) { v =>
-  def scalasbt(repo: String) = ("scalasbt " + repo, "http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-" + repo)
-  val (name, repo) = if (v.endsWith("-SNAPSHOT")) scalasbt("snapshots") else scalasbt("releases")
-  Some(Resolver.url(name, url(repo))(Resolver.ivyStylePatterns))
-}

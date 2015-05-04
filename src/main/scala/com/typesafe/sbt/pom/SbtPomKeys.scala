@@ -4,7 +4,8 @@ import sbt._
 import org.apache.maven.model.Model
 import org.apache.maven.settings.{Settings ⇒ MavenSettings}
 
-object SbtPomKeys {
+/** Public plugin keys. */
+trait SbtPomKeys {
   val pomLocation = SettingKey[File]("mvn-pom-location", "The location where we can find a pom file.")
   val settingsLocation = SettingKey[File]("mvn-settings-location", "The location of the user settings file. Defaults to `~/.m2/settings.xml`")
   val profiles = SettingKey[Seq[String]]("mvn-profiles", "List of maven profiles to be applied.")
@@ -14,3 +15,5 @@ object SbtPomKeys {
   val showEffectivePom = TaskKey[Unit]("show-effective-pom", "Displays the effective pom from maven.")
   val mavenUserProperties = SettingKey[Map[String, String]]("maven-user-properties","A map of user properties to be applied")
 }
+
+object SbtPomKeys extends SbtPomKeys

@@ -1,6 +1,5 @@
 package com.typesafe.sbt.pom
 
-
 import org.sonatype.aether.repository.RemoteRepository
 import org.apache.maven.model.Model
 import org.sonatype.aether.RepositorySystem
@@ -14,7 +13,6 @@ import org.apache.maven.model.building.{
 import collection.JavaConverters._
 import java.util.Locale
 import org.apache.maven.model.resolution.ModelResolver
-import org.apache.maven.artifact.resolver.DefaultArtifactResolver
 
 object MvnPomResolver {
   val system = newRepositorySystemImpl

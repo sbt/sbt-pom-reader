@@ -1,5 +1,3 @@
-useMavenPom
-
 
 TaskKey[Unit]("check-settings") <<= state map { s =>
   val extracted = Project extract s
