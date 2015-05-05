@@ -4,6 +4,7 @@ import sbt._
 import org.apache.maven.model.Model
 import org.apache.maven.settings.{Settings ⇒ MavenSettings}
 
+/** Public plugin keys. */
 object SbtPomKeys {
   val pomLocation = SettingKey[File]("mvn-pom-location", "The location where we can find a pom file.")
   val settingsLocation = SettingKey[File]("mvn-settings-location", "The location of the user settings file. Defaults to `~/.m2/settings.xml`")
