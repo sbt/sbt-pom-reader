@@ -18,7 +18,8 @@ initialCommands :=
   """| import com.typesafe.sbt.pom._
      | import sbt._
      | val localRepo = file(sys.props("user.home")) / ".m2" / "repository"
-     | val pom = loadEffectivePom(localRepo, file("src/sbt-test/simple-pom/can-extract-basics/pom.xml"))
+     | val pomFile = file("src/sbt-test/simple-pom/can-extract-basics/pom.xml")
+     | val pom = loadEffectivePom(pomFile, localRepo, Seq.empty, Map.empty)
      |""".stripMargin
 
 
