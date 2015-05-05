@@ -13,15 +13,15 @@ import Project.Initialize
 import SbtPomKeys._
 import collection.JavaConverters._
 import MavenUserSettingsHelper._
-
 import scala.util.Try
+
 /** Helper object to extract maven settings. */
 object MavenHelper {
   
   // Load pom values into settings.
   val useMavenPom: Seq[Setting[_]] =
     loadPomInSettings ++ pullSettingsFromPom
-  
+
   def loadPomInSettings: Seq[Setting[_]]= Seq(
     pomLocation <<= baseDirectory apply (_ / "pom.xml"),
     settingsLocation := file(sys.props("user.home")) / ".m2" / "settings.xml",
@@ -48,7 +48,7 @@ object MavenHelper {
     try writer.write(out, pom)
     catch {
       case e: Throwable =>
-        e.printStackTrace
+        e.printStackTrace()
         throw e
     }
     finally out.close()
