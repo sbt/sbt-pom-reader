@@ -32,7 +32,7 @@ Each of the files should have the following contents.
 
 `project/build.properties`:
 
-    sbt.version=0.13.2
+    sbt.version=0.13.8
 
 `project/build.scala`:
 
