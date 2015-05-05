@@ -2,18 +2,13 @@ package com.typesafe.sbt
 
 import org.apache.maven.repository.internal.MavenServiceLocator
 import org.apache.maven.repository.internal.MavenRepositorySystemSession
-import org.sonatype.aether.{
-  RepositorySystem,
-  RepositorySystemSession
-}
+import org.sonatype.aether.RepositorySystem
 import org.sonatype.aether.connector.wagon.{
   WagonProvider, 
-  WagonRepositoryConnectorFactory,
-  PlexusWagonProvider
+  WagonRepositoryConnectorFactory
 }
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory
 import org.sonatype.aether.repository.LocalRepository
-import org.sonatype.aether.util.DefaultRepositorySystemSession
 import org.sonatype.aether.RepositorySystemSession
 import java.io.File
 
