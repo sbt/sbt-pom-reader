@@ -1,5 +1,7 @@
 # sbt pom reader plugin
 
+[![Build Status](https://travis-ci.org/sbt/sbt-pom-reader.svg?branch=master)](https://travis-ci.org/sbt/sbt-pom-reader)
+
 This project aims to read maven pom files and configure sbt appropriately.  We have limited aims:
 
 1. We do not plan to parse/use maven plugins.  Only the ones which users submit handling code for
@@ -20,9 +22,9 @@ You want you project directory to look like the following:
   project/
      build.properties      <- the sbt version specification
      build.scala           <- the sbt build definition
-     plugins.sbt           <- the sbt plugin configuratoin
+     plugins.sbt           <- the sbt plugin configuration
 
-  ..                       <- Whatever files are normally in your maven proejct.
+  ..                       <- Whatever files are normally in your maven project.
 
 ```
 
@@ -58,7 +60,7 @@ val buildLocation = (file(".").getAbsoluteFile.getParentFile)
 // the subproject.
 val subproject = ProjectRef(buildLoc, "subproject")
 
-// Disable all scalac arguemnts when running the REPL.
+// Disable all scalac arguments when running the REPL.
 scalacOptions in subproject in Compile in console := Seq.empty
 ```
 
