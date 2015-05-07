@@ -1,6 +1,3 @@
-import com.typesafe.sbt.pom.SbtPomKeys.settingsLocation
-
-useMavenPom
 
 settingsLocation := baseDirectory.value / "override-settings.xml"
 
