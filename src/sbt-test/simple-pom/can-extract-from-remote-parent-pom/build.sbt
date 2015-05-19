@@ -1,5 +1,4 @@
-useMavenPom
-
+enablePlugins(PomReaderPlugin)
 
 TaskKey[Unit]("check-settings") <<= state map { s =>
   val extracted = Project extract s

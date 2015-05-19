@@ -32,7 +32,7 @@ Each of the files should have the following contents.
 
 `project/build.properties`:
 
-    sbt.version=0.13.2
+    sbt.version=0.13.8
 
 `project/build.scala`:
 
@@ -71,6 +71,6 @@ Please feel free to contribute example/test maven projects you'd like to be able
 
 # Licensing
 
-Apache 2 software license.  Links and stuff to follow.
+Apache 2 software license.  See [LICENSE](LICENSE).
 
 

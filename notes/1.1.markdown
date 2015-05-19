@@ -1,0 +1,19 @@
+# `sbt-pom-reader` Release 1.1
+
+## Enhancements
+
+* Converted processing of `settings.xml` to use official Maven library enabling proper handling of profiles.
+* Ability to include resolvers (repositories) defined in `settings.xml`.
+* Ability to override location of `settings.xml` file via `settingsLocation` key.
+* Converted to `AutoPlugin`
+
+## Bug Fixes
+
+* Fixed scripted commands with incorrect subproject references
+* Provided default for `mavenUserProperties`.
+
+## Project Management
+
+* Added [Travis-CI build](https://travis-ci.org/sbt/sbt-pom-reader) support.
+* Added [Bintray](https://bintray.com/sbt/sbt-plugin-releases/sbt-pom-reader) support.
+* Additional `scripted` tests around `settings.xml` file handling and repository credentials processing.

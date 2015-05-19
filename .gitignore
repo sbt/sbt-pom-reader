@@ -1,13 +1,7 @@
-sbt
 sbt-launch.jar
 logs
 project/project
-project/project/target
-project/target
 target
-/target
-**/target/**
-/target/**
 tmp
 .history
 dist
