@@ -1,4 +1,4 @@
-# `sbt-pom-reader` Release 1.1
+# Release 2.0
 
 ## Enhancements
 
