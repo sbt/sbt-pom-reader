@@ -43,7 +43,7 @@ Each of the files should have the following contents.
 
 `project/plugins.sbt`:
 
-     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "1.0.1")
+     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "2.0.0")
      
 
 ## Configuring projects
