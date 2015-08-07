@@ -1,14 +1,12 @@
 package com.typesafe.sbt.pom
 
-import com.typesafe.sbt.pom.SbtPomKeys._
 import org.apache.maven.model.{Model ⇒ PomModel, Repository ⇒ PomRepository}
+import org.apache.maven.settings.building.{DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest}
 import org.apache.maven.settings.{Settings ⇒ MavenSettings}
-import org.apache.maven.settings.building.{DefaultSettingsBuildingRequest, DefaultSettingsBuilderFactory}
-import sbt.Project._
 import sbt._
 
-import scala.collection.JavaConverters._
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 /** Helper object with functions to extract settings from the user's
   * Maven settings file (typically ~/.m2/settings.xml) */
@@ -28,11 +26,12 @@ object MavenUserSettingsHelper {
     } else None
   }
 
+  /** Extract any resolvers defined through the user settings.xml file. */
   def getUserResolvers(settings: MavenSettings): Seq[Resolver] = {
     val profiles = settings.getProfilesAsMap
     for {
       profileName ← settings.getActiveProfiles
-      profile = profiles.get(profileName)
+      profile ← Option(profiles.get(profileName)).toSeq
       repo ← profile.getRepositories
     } yield repo.getId at repo.getUrl
   }
