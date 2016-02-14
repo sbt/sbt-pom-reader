@@ -4,14 +4,17 @@
 
 [![Build Status](https://travis-ci.org/sbt/sbt-pom-reader.svg?branch=master)](https://travis-ci.org/sbt/sbt-pom-reader)
 
-This project aims to read maven pom files and configure sbt appropriately.  We have limited aims:
+This project aims to read Maven `pom.xml` files and configure a basic sbt project appropriately.  We have limited aims:
 
-1. We do not plan to parse/use maven plugins.  Only the ones which users submit handling code for
-2. Failure to read a pom file causes the maven build to crash, sorry
-3. Unexpected maven-y things will simply fail to translate.
-4. Majority of simple maven projects will be usable directly in sbt from the maven pom.
-5. Parent pom resolution and inheritance should work.
-6. Multi-module builds should work assuming each project meets an above caveat (at least, once we implement support).
+1. The intent is not to parse/use Maven plugins. The purpose is to translate project structure, dependencies, and artifact resolution
+2. Failure to read a `pom.xml` file causes the Maven build to crash
+3. Unexpected Maven-y things will simply fail to translate
+4. Majority of simple Maven projects will be usable directly in sbt from the Maven `pom.xml`
+
+That said:
+
+1. Parent pom resolution and inheritance should work
+2. Multi-module builds should work, assuming each module meets the above caveats
 
 
 # Usage
