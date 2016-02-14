@@ -49,6 +49,10 @@ Each of the files should have the following contents.
      addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "2.0.0")
      
 
+Note: Release candidate `2.1.0-RC1` is available, providing updates to the Maven/Wagon/Aether library versions. (Testing and bug reporting is appreciated!)
+
+     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "2.1.0-RC1")
+
 ## Configuring projects
 
 If the pom-reader plugin doesn't have a 100% mapping from your maven build into sbt (i.e. there is some kind 
