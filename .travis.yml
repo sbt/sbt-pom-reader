@@ -3,7 +3,13 @@ scala:
    - 2.10.4
 jdk:
    - openjdk6
+   
+# Fix OpenJDK builds
+# https://github.com/travis-ci/travis-ci/issues/5227
+sudo: false
+
 env:
   - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256M -XX:MaxPermSize=512M"
+
 script:
   - sbt ++$TRAVIS_SCALA_VERSION --warn update compile scripted
