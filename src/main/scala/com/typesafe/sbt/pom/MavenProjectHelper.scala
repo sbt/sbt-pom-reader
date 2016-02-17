@@ -41,7 +41,8 @@ object MavenProjectHelper {
   }
   case class AggregateProject(model: PomModel, dir: File, children: Seq[ProjectTree]) extends ProjectTree
   case class SimpleProject(model: PomModel, dir: File) extends ProjectTree
-  
+  case class ProjectDep(x: ProjectTree, isTestScoped: Boolean)
+
   def makeReactorProject(baseDir: File, overrideRootProjectName:Option[String] = None,
                          profiles: Seq[String], userProps: Map[String, String]): Seq[Project] = {
     // First create a tree of how things aggregate.
@@ -51,7 +52,7 @@ object MavenProjectHelper {
     // Create a mapping of all dependencies between projects.
     val depMap = makeDependencyMap(projects)
     // Helper to look up dependencies in the presence of absences.
-    def getDepsFor(project: ProjectTree): Seq[ProjectTree] =
+    def getDepsFor(project: ProjectTree): Seq[ProjectDep] =
       depMap.getOrElse(project, Nil)
     // Now, sort projects in an order that we can create them.
     val sorted: Seq[ProjectTree] =
@@ -61,17 +62,18 @@ object MavenProjectHelper {
           case _ => Nil
         }
         val deps = getDepsFor(project)
-        aggregates ++ deps
+        aggregates ++ deps.map(_.x)
       }
     def makeProjects(toMake: Seq[ProjectTree], made: Map[ProjectTree, Project] = Map.empty): Seq[Project] = 
       toMake match {
         case current :: rest =>
           // Make a project, and add it to the stack
-          val depProjects: Seq[Project] =
+          val depProjects: Seq[(Project, Boolean)] =
             for {
               dep <- getDepsFor(current)
-              depProject <- made.get(dep)
-            } yield depProject
+              depProject <- made.get(dep.x)
+              isTestScoped = dep.isTestScoped
+            } yield depProject -> isTestScoped
           val aggregates: Seq[Project] =
             current match {
               case AggregateProject(_,_, children) =>
@@ -81,13 +83,19 @@ object MavenProjectHelper {
                 } yield depProject
               case _ => Nil
             }
+
+          def projectToClasspathDep(x: (Project, Boolean)): ClasspathDep[ProjectReference] = x match {
+            case (project, true) => project % "test->test"
+            case (project, false) => project
+          }
+
           // TODO - Configure debugging output....
           val currentProject = (
               Project(makeProjectName(current.model,overrideRootProjectName),current.dir)
               // First pull in settings from pom
               settings(useMavenPom:_*)
               // Now update depends on relationships
-              dependsOn(depProjects.map(x =>x: ClasspathDep[ProjectReference]):_*)
+              dependsOn(depProjects.map(x => projectToClasspathDep(x)):_*)
               // Now fix aggregate relationships
               aggregate(aggregates.map(x => x:ProjectReference):_*)
               // Now remove any inter-project dependencies we pulled in from the maven pom.
@@ -95,14 +103,13 @@ object MavenProjectHelper {
               // post-filter artifacts?
               settings(
                 Keys.libraryDependencies <<= Keys.libraryDependencies apply { deps =>
-                  val depIds = getDepsFor(current).map(_.id).toSet
+                  val depIds = getDepsFor(current).map(_.x.id).toSet
                   deps filterNot { dep =>
                     val id = makeId(dep.organization, dep.name, dep.revision)
                     depIds contains id
                   }  
                 }     
               )
-              
           )
           makeProjects(rest, made + (current -> currentProject))
         case Nil => made.values.toSeq
@@ -132,16 +139,18 @@ object MavenProjectHelper {
         Seq(agg) ++ agg.children.flatMap(allProjectsInTree)
     }
   // Detects dependencies between projects
-  def makeDependencyMap(projects: Seq[ProjectTree]): Map[ProjectTree, Seq[ProjectTree]] = {
+  def makeDependencyMap(projects: Seq[ProjectTree]): Map[ProjectTree, Seq[ProjectDep]] = {
     val findDeps =
       for(project <- projects) yield {
         val deps =
           for {
             dep <- Option(project.model.getDependencies).map(_.asScala).getOrElse(Nil)
             depId = makeId(dep.getGroupId, dep.getArtifactId, dep.getVersion)
+            isTestScope = dep.getScope == "test"
             pdep <- projects
             if pdep.id == depId
-          } yield pdep
+          } yield ProjectDep(pdep, isTestScope)
+
         project -> deps
       }
     findDeps.toMap
