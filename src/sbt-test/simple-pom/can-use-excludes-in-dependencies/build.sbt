@@ -1,6 +1,6 @@
 
-TaskKey[Unit]("check-settings") <<= state map { s =>
-  val extracted = Project extract s
+TaskKey[Unit]("check-settings") := {
+  val extracted = Project extract state.value
   val deps = extracted.get(libraryDependencies)
 
   assert(deps.exists(_.name.contains("bijection-core")), "Expected to find dependency `bijection-core`")

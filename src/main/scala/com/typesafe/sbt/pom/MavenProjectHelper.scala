@@ -94,9 +94,9 @@ object MavenProjectHelper {
               // TODO - Maybe we can fix the useMavenPom settings so we don't need to
               // post-filter artifacts?
               settings(
-                Keys.libraryDependencies <<= Keys.libraryDependencies apply { deps =>
+                Keys.libraryDependencies := {
                   val depIds = getDepsFor(current).map(_.id).toSet
-                  deps filterNot { dep =>
+                  Keys.libraryDependencies.value.filterNot { dep =>
                     val id = makeId(dep.organization, dep.name, dep.revision)
                     depIds contains id
                   }  
