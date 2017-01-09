@@ -23,14 +23,14 @@ object MavenHelper {
     loadPomInSettings ++ pullSettingsFromPom
 
   def loadPomInSettings: Seq[Setting[_]]= Seq(
-    pomLocation <<= baseDirectory apply (_ / "pom.xml"),
+    pomLocation := baseDirectory.value / "pom.xml",
     settingsLocation := file(sys.props("user.home")) / ".m2" / "settings.xml",
     mvnLocalRepository := defaultLocalRepo,
     profiles := Seq.empty,
     mavenUserProperties := Map.empty,
-    effectivePom <<= (pomLocation, mvnLocalRepository, profiles, mavenUserProperties) apply loadEffectivePom,
-    effectiveSettings <<= (settingsLocation, profiles) apply loadUserSettings,
-    showEffectivePom <<= (pomLocation, effectivePom, streams) map showPom
+    effectivePom := loadEffectivePom(pomLocation.value, mvnLocalRepository.value, profiles.value, mavenUserProperties.value),
+    effectiveSettings := loadUserSettings(settingsLocation.value, profiles.value),
+    showEffectivePom := showPom(pomLocation.value, effectivePom.value, streams.value)
   )
   
 
@@ -62,39 +62,39 @@ object MavenHelper {
 
   def pullSettingsFromPom: Seq[Setting[_]] = Seq(
     /* Often poms have artifactId with binary version suffix. This should ideally be removed. */
-    name <<= fromPom(x => removeBinaryVersionSuffix(x.getArtifactId)),
-    organization <<= fromPom(_.getGroupId),
-    version <<= fromPom(_.getVersion),
+    name := fromPom(x => removeBinaryVersionSuffix(x.getArtifactId)).value,
+    organization := fromPom(_.getGroupId).value,
+    version := fromPom(_.getVersion).value,
     // TODO - Add configuration on whether we force the scalaVersion to exist...
-    scalaVersion <<= (effectivePom, scalaVersion, pomLocation) apply { (model, old, file) =>
-      getScalaVersion(model) getOrElse {
-        println("Unable to determine scala version in: " + file + ", using " + scalaVersion)
-        old
+    scalaVersion := {
+      getScalaVersion(effectivePom.value) getOrElse {
+        println("Unable to determine scala version in: " + pomLocation.value + ", using " + scalaVersion)
+        scalaVersion.value
       }
     },
 
-    unmanagedSourceDirectories in Compile <++= (effectivePom,  baseDirectory) apply { (pom, base) =>
-      getAdditionalSourcesFromPlugin(pom).filterNot(_.contains("test")).map(x => base / x)
+    unmanagedSourceDirectories in Compile ++= {
+      getAdditionalSourcesFromPlugin(effectivePom.value).filterNot(_.contains("test")).map(x => baseDirectory.value / x)
     },
 
-    unmanagedSourceDirectories in Test <++= (effectivePom,  baseDirectory) apply { (pom, base) =>
-      getAdditionalSourcesFromPlugin(pom).filter(_.contains("test")).map(x => base / x)
+    unmanagedSourceDirectories in Test ++= {
+      getAdditionalSourcesFromPlugin(effectivePom.value).filter(_.contains("test")).map(x => baseDirectory.value / x)
     },
 
-    libraryDependencies <++= fromPom(getDependencies),
-    resolvers <++= (effectivePom, effectiveSettings) apply { (pom, settings) ⇒
-      val pr = getPomResolvers(pom)
-      val sr = settings.map(getUserResolvers).getOrElse(Seq.empty)
+    libraryDependencies ++= fromPom(getDependencies).value,
+    resolvers ++= {
+      val pr = getPomResolvers(effectivePom.value)
+      val sr = effectiveSettings.value.map(getUserResolvers).getOrElse(Seq.empty)
       pr ++ sr
     },
     // TODO - split into Compile/Test/Runtime/Console
-    scalacOptions <++= (effectivePom) map { pom =>
-      getScalacOptions(pom)
+    scalacOptions ++= {
+      getScalacOptions(effectivePom.value)
     },
-    credentials <++= (effectivePom, effectiveSettings) map createSbtCredentialsFromUserSettings
+    credentials ++= createSbtCredentialsFromUserSettings(effectivePom.value, effectiveSettings.value)
   )
   
-  def fromPom[T](f: PomModel => T): Initialize[T] =
+  def fromPom[T](f: PomModel => T): Def.Initialize[T] =
     effectivePom apply f
     
   // TODO - Use the sbt setting to configure this one...

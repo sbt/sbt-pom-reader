@@ -1,8 +1,8 @@
 
 settingsLocation := baseDirectory.value / "non-existent-file.xml"
 
-TaskKey[Unit]("check-settings") <<= (state, baseDirectory) map { (s, basedir) =>
-  val extracted = Project extract s
+TaskKey[Unit]("check-settings") := {
+  val extracted = Project extract state.value
   def testSetting[T](key: SettingKey[T], expected: T): Unit = {
     val found = extracted get key
     assert(expected == found, "Failed to extract setting: " + key + ", expected: " + expected + ", found: " + found)
@@ -16,7 +16,7 @@ TaskKey[Unit]("check-settings") <<= (state, baseDirectory) map { (s, basedir) =>
   testSetting(version, "1.0-SNAPSHOT")
   testSetting(scalaVersion, "2.10.2")
   testSetting(organization, "com.jsuereth.junk")
-  val expectedFile = basedir / "non-existent-file.xml"
+  val expectedFile = baseDirectory.value / "non-existent-file.xml"
   testSetting(settingsLocation, expectedFile)
   assert(!expectedFile.exists(), "File can't exist if I'm to test handling non-existence. Please delete " + expectedFile)
 }

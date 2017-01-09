@@ -1,7 +1,8 @@
 
 settingsLocation := baseDirectory.value / "override-settings.xml"
 
-TaskKey[Unit]("check-settings") <<= state map { s =>
+TaskKey[Unit]("check-settings") := {
+  val s = state.value
   val extracted = Project extract s
   val (_, creds) = extracted runTask(credentials, s)
   val found = creds.exists {

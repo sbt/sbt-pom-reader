@@ -19,5 +19,5 @@ initialCommands in console :=
 
 scriptedSettings
 
-scriptedLaunchOpts <+= version apply { v => "-Dproject.version=" + v }
+scriptedLaunchOpts += { "-Dproject.version=" + version.value }
 
