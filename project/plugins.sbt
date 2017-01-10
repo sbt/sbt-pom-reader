@@ -3,6 +3,8 @@ resolvers += Resolver.url(
     url("http://dl.bintray.com/content/sbt/sbt-plugin-releases"))(
         Resolver.ivyStylePatterns)
 
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+
 resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.4")
@@ -12,4 +14,3 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 libraryDependencies += {
   "org.scala-sbt" % "scripted-plugin" % sbtVersion.value
 }
-
