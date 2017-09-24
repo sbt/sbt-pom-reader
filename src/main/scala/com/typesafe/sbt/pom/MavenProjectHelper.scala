@@ -8,7 +8,6 @@ import org.apache.maven.model.{
   Dependency => PomDependency,
   Repository => PomRepository
 }
-import Project.Initialize
 import SbtPomKeys._
 import collection.JavaConverters._
 

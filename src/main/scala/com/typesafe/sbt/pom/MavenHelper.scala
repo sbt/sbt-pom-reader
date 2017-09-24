@@ -9,7 +9,6 @@ import org.apache.maven.model.{
   Repository => PomRepository
 }
 import org.apache.maven.settings.{Settings ⇒ MavenSettings}
-import Project.Initialize
 import SbtPomKeys._
 import collection.JavaConverters._
 import MavenUserSettingsHelper._
