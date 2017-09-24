@@ -17,7 +17,4 @@ initialCommands in console :=
      |""".stripMargin
 
 
-scriptedSettings
-
-scriptedLaunchOpts += { "-Dproject.version=" + version.value }
-
+scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
