@@ -5,7 +5,6 @@ import org.apache.maven.settings.building.{DefaultSettingsBuilderFactory, Defaul
 import org.apache.maven.settings.{Settings ⇒ MavenSettings}
 import sbt._
 
-import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /** Helper object with functions to extract settings from the user's
@@ -30,16 +29,16 @@ object MavenUserSettingsHelper {
   def getUserResolvers(settings: MavenSettings): Seq[Resolver] = {
     val profiles = settings.getProfilesAsMap
     for {
-      profileName ← settings.getActiveProfiles
+      profileName ← settings.getActiveProfiles.asScala
       profile ← Option(profiles.get(profileName)).toSeq
-      repo ← profile.getRepositories
+      repo ← profile.getRepositories.asScala
     } yield repo.getId at repo.getUrl
   }
 
   /** Extract the server credentials from the given settings file. */
   def serverCredentials(settings: MavenSettings): Seq[ServerCredentials] = {
     for {
-      s ← settings.getServers
+      s ← settings.getServers.asScala
     } yield ServerCredentials(s.getId, s.getUsername, s.getPassword)
   }
 
