@@ -1,5 +1,5 @@
 
-TaskKey[Unit]("check-settings") := {
+TaskKey[Unit]("checkSettings") := {
   val extracted = Project extract state.value
   val deps = extracted.get(libraryDependencies)
 

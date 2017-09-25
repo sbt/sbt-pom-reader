@@ -1,5 +1,5 @@
 
-TaskKey[Unit]("check-settings") := {
+TaskKey[Unit]("checkSettings") := {
   val extracted = Project extract state.value
   def testSetting[T](key: SettingKey[T], expected: T): Unit = {
     val found = extracted get key
