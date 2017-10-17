@@ -1,7 +1,11 @@
 # Release Process Outline
 
 
-4. Run `git clean -fdx`. This makes sure there are no unexpected dependencies or artifacts that could affect the build.
+1. Run `git clean -fdx`. This makes sure there are no unexpected dependencies or artifacts that could affect the build.
+
+
+
+
 1. Create a branch to do the release work on. Something like `release-<X>.<Y>.<Z>` is good.
 2. Write release notes in Markdown with filename  `notes/<X>.<Y>.markdown`. Go through the commit logs and collect the major new features, bug fixes, deprecations, and anything else relevant to users. Making note of breaking changes is particularly important.
 5. Run `git tag -u <GPG key id> v<X>.<Y>.<Z> && git push`. This creates the tag that the `sbt-git` plugin will use to extract the artifact version number and publishes it. Providing a GPG key is just good form. [Here's some documention](http://www.dewinter.com/gnupg_howto/english/GPGMiniHowto-3.html) on how to get set up to have one.

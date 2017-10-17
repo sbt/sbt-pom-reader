@@ -1,0 +1,10 @@
+# Release 2.1.0
+
+## New Features
+
+* Support for sbt 1.0.2 (@blast-hardcheese)
+
+## Maintenance
+
+* General code and dependency cleanup (@blast-hardcheese, @xuwei-k)
+* Fixed scripted tests to work with sbt 1.0.2 (@metasim)
