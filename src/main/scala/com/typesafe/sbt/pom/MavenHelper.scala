@@ -70,7 +70,7 @@ object MavenHelper {
       val log = sLog.value
       getScalaVersion(effectivePom.value) getOrElse {
         if (!isJavaOnly.value)
-          log.warn("Unable to determine scala version in: " + pomLocation.value + ", using " + scalaVersion)
+          log.warn("Unable to determine scala version in: " + pomLocation.value + ", using " + scalaVersion.value)
         scalaVersion.value
       }
     },
