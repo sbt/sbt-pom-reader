@@ -29,7 +29,8 @@ object MavenHelper {
     mavenUserProperties := Map.empty,
     effectivePom := loadEffectivePom(pomLocation.value, mvnLocalRepository.value, profiles.value, mavenUserProperties.value),
     effectiveSettings := loadUserSettings(settingsLocation.value, profiles.value),
-    showEffectivePom := showPom(pomLocation.value, effectivePom.value, streams.value)
+    showEffectivePom := showPom(pomLocation.value, effectivePom.value, streams.value),
+    isJavaOnly := false
   )
   
 
@@ -66,8 +67,10 @@ object MavenHelper {
     version := fromPom(_.getVersion).value,
     // TODO - Add configuration on whether we force the scalaVersion to exist...
     scalaVersion := {
+      val log = sLog.value
       getScalaVersion(effectivePom.value) getOrElse {
-        println("Unable to determine scala version in: " + pomLocation.value + ", using " + scalaVersion)
+        if (!isJavaOnly.value)
+          log.warn("Unable to determine scala version in: " + pomLocation.value + ", using " + scalaVersion)
         scalaVersion.value
       }
     },
