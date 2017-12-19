@@ -2,7 +2,7 @@ package com.typesafe.sbt.pom
 
 import org.apache.maven.model.building.{ FileModelSource, ModelSource }
 import org.apache.maven.model.resolution.{ ModelResolver, UnresolvableModelException }
-import org.apache.maven.model.{ Parent, Repository }
+import org.apache.maven.model.{ Dependency, Parent, Repository }
 import org.eclipse.aether.RepositorySystemSession
 import org.eclipse.aether.artifact.DefaultArtifact
 import org.eclipse.aether.repository.RemoteRepository
@@ -34,6 +34,9 @@ class MavenModelResolver(
       }
     new FileModelSource(pomArtifact.getFile)
   }
+
+  override def resolveModel(dependency: Dependency): ModelSource =
+    resolveModel(dependency.getGroupId, dependency.getArtifactId, dependency.getVersion)
 
   override def resolveModel(parent: Parent): ModelSource =
     resolveModel(parent.getGroupId, parent.getArtifactId, parent.getVersion)
