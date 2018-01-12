@@ -1,8 +1,8 @@
 package com.typesafe.sbt.pom
 
-import org.sonatype.aether.repository.RemoteRepository
+import org.eclipse.aether.repository.RemoteRepository
 import org.apache.maven.model.Model
-import org.sonatype.aether.RepositorySystem
+import org.eclipse.aether.RepositorySystem
 import java.io.File
 import org.apache.maven.model.building.{
   DefaultModelBuildingRequest, 
@@ -27,7 +27,7 @@ class MvnPomResolver(system: RepositorySystem, localRepo: File) {
    
    private val defaultRepositories: Seq[RemoteRepository] =
      Seq(
-       new RemoteRepository( "central", "default", " http://repo.maven.apache.org/maven2" )    
+       new RemoteRepository.Builder( "central", "default", " http://repo.maven.apache.org/maven2" ).build()
      )
    
    // TODO - Add repositories from the pom...

@@ -1,29 +1,25 @@
 package com.typesafe.sbt
 
-import org.apache.maven.repository.internal.MavenServiceLocator
-import org.apache.maven.repository.internal.MavenRepositorySystemSession
-import org.sonatype.aether.RepositorySystem
-import org.sonatype.aether.connector.wagon.{
-  WagonProvider, 
-  WagonRepositoryConnectorFactory
-}
-import org.sonatype.aether.spi.connector.RepositoryConnectorFactory
-import org.sonatype.aether.repository.LocalRepository
-import org.sonatype.aether.RepositorySystemSession
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils
+import org.eclipse.aether.RepositorySystem
+import org.eclipse.aether.transport.wagon.{WagonProvider, WagonTransporterFactory}
+import org.eclipse.aether.spi.connector.transport.TransporterFactory
+import org.eclipse.aether.repository.LocalRepository
+import org.eclipse.aether.DefaultRepositorySystemSession
 import java.io.File
 
 /** Helper methods for dealing with starting up Aether. */
 package object pom {
   def newRepositorySystemImpl: RepositorySystem = {
-    val locator = new MavenServiceLocator
-    locator.addService(classOf[RepositoryConnectorFactory], classOf[WagonRepositoryConnectorFactory])
+    val locator = MavenRepositorySystemUtils.newServiceLocator()
+    locator.addService(classOf[TransporterFactory], classOf[WagonTransporterFactory])
     locator.setServices(classOf[WagonProvider], new HackedWagonProvider)
     locator.getService(classOf[RepositorySystem])
   }
-  def newSessionImpl(system: RepositorySystem, localRepoDir: File): RepositorySystemSession  = {
-    val session = new MavenRepositorySystemSession
+  def newSessionImpl(system: RepositorySystem, localRepoDir: File)  = {
+    val session = new DefaultRepositorySystemSession
     val localRepo = new LocalRepository(localRepoDir.getAbsolutePath)
-    session setLocalRepositoryManager (system newLocalRepositoryManager localRepo)
+    session setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo))
     session
   }
   

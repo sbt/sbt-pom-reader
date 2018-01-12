@@ -2,24 +2,24 @@ package com.typesafe.sbt.pom
 
 
 import java.io.File
-import org.apache.maven.model.Repository
+import org.apache.maven.model.{Dependency, Parent, Repository}
 import org.apache.maven.model.building.FileModelSource
 import org.apache.maven.model.building.ModelSource
 import org.apache.maven.model.resolution.InvalidRepositoryException
 import org.apache.maven.model.resolution.ModelResolver
 import org.apache.maven.model.resolution.UnresolvableModelException
-import org.sonatype.aether.RepositorySystemSession
-import org.sonatype.aether.RequestTrace
-import org.sonatype.aether.artifact.Artifact
-import org.sonatype.aether.impl.ArtifactResolver
-import org.sonatype.aether.impl.RemoteRepositoryManager
-import org.sonatype.aether.repository.RemoteRepository
-import org.sonatype.aether.resolution.ArtifactRequest
-import org.sonatype.aether.resolution.ArtifactResolutionException
-import org.sonatype.aether.util.artifact.DefaultArtifact
+import org.eclipse.aether.RepositorySystemSession
+import org.eclipse.aether.RequestTrace
+import org.eclipse.aether.artifact.Artifact
+import org.eclipse.aether.impl.ArtifactResolver
+import org.eclipse.aether.impl.RemoteRepositoryManager
+import org.eclipse.aether.repository.RemoteRepository
+import org.eclipse.aether.resolution.ArtifactRequest
+import org.eclipse.aether.resolution.ArtifactResolutionException
+import org.eclipse.aether.artifact.DefaultArtifact
 import collection.JavaConverters._
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils
-import org.sonatype.aether.RepositorySystem
+import org.eclipse.aether.RepositorySystem
 /**
  * We implement this because maven hides theirs.  RUN BUT YOU CAN'T HIDE, LITTLE MAVEN.
  */
@@ -32,6 +32,13 @@ class MyModelResolver(
 
   private[this] var _repositories: Seq[RemoteRepository] = repositories
   
+  override def resolveModel(parent: Parent): ModelSource =
+    resolveModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion())
+
+  override def resolveModel(dependency: Dependency): ModelSource = {
+    resolveModel(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion())
+  }
+
   override def resolveModel(
     groupId: String,
     artifactId: String,
@@ -52,13 +59,17 @@ class MyModelResolver(
   override def newCopy = 
     new MyModelResolver(session, system, context, _repositories)
   
-  override def addRepository(repository: Repository): Unit = {
+  override def addRepository(repository: Repository, replace: Boolean): Unit = {
      val exists =
        _repositories.exists(_.getId == repository.getId)
-     if(!exists) {
+     if(!exists || replace) {
        // TODO - Should we use the remote repo manager?
        val newRemote = ArtifactDescriptorUtils.toRemoteRepository(repository) 
+       _repositories = _repositories.filterNot(_.getId == repository.getId)
        _repositories :+= newRemote
      }
    }
+
+  override def addRepository(repository: Repository): Unit =
+    addRepository(repository, false)
 }
