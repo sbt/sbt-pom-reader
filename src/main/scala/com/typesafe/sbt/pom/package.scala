@@ -4,7 +4,6 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.repository.LocalRepository
-import org.eclipse.aether.DefaultRepositorySystemSession
 import org.eclipse.aether.transport.wagon.WagonTransporterFactory
 import org.eclipse.aether.transport.file.FileTransporterFactory
 import org.eclipse.aether.transport.http.HttpTransporterFactory
@@ -23,7 +22,7 @@ package object pom {
     locator.getService(classOf[RepositorySystem])
   }
   def newSessionImpl(system: RepositorySystem, localRepoDir: File)  = {
-    val session = new DefaultRepositorySystemSession
+    val session = MavenRepositorySystemUtils.newSession()
     val localRepo = new LocalRepository(localRepoDir.getAbsolutePath)
     session setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo))
     session
