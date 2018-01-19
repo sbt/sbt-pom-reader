@@ -6,12 +6,15 @@ import org.eclipse.aether.transport.wagon.{WagonProvider, WagonTransporterFactor
 import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.repository.LocalRepository
 import org.eclipse.aether.DefaultRepositorySystemSession
+import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
+import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
 import java.io.File
 
 /** Helper methods for dealing with starting up Aether. */
 package object pom {
   def newRepositorySystemImpl: RepositorySystem = {
     val locator = MavenRepositorySystemUtils.newServiceLocator()
+    locator.addService(classOf[RepositoryConnectorFactory], classOf[BasicRepositoryConnectorFactory])
     locator.addService(classOf[TransporterFactory], classOf[WagonTransporterFactory])
     locator.getService(classOf[RepositorySystem])
   }

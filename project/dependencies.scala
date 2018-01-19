@@ -5,8 +5,9 @@ object Dependencies {
   val mvnVersion = "3.5.2"
   val mvnResolver = "1.1.0"
 
-  val transportWagon      = "org.apache.maven.resolver" % "maven-resolver-transport-wagon" % mvnResolver
+  val connectorBasic      = "org.apache.maven.resolver" % "maven-resolver-connector-basic" % mvnResolver
   val mvnEmbedder         = "org.apache.maven" % "maven-embedder" % mvnVersion exclude("com.google.guava", "guava") exclude("org.codehaus.plexus", "plexus-utils")
+  val transportWagon      = "org.apache.maven.resolver" % "maven-resolver-transport-wagon" % mvnResolver
 
   // These were explicitly added to resolve dependency conflicts in
   // maven-embedder. Please keep these up-to-date, with the goal of
@@ -18,6 +19,7 @@ object Dependencies {
 
   def pluginDependencies =
      Seq(
+      connectorBasic,
       mvnEmbedder,
       transportWagon,
     ) ++ mvnEmbedderDeps
