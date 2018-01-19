@@ -33,7 +33,7 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
    
    // TODO - Add repositories from the pom...
    val modelResolver: ModelResolver = {
-     new MyModelResolver(
+     new MavenModelResolver(
        session,
        system,
        repositories = defaultRepositories
