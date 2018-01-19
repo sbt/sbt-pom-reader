@@ -28,9 +28,9 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
    
    private val defaultRepositories: Seq[RemoteRepository] =
      Seq(
-       new RemoteRepository.Builder( "central", "default", " http://repo.maven.apache.org/maven2" ).build()
+       new RemoteRepository.Builder("central", "default", "http://repo.maven.apache.org/maven2").build()
      )
-   
+
    // TODO - Add repositories from the pom...
    val modelResolver: ModelResolver = {
      new MavenModelResolver(

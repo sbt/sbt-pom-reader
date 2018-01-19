@@ -21,18 +21,18 @@ package object pom {
     locator.addService(classOf[TransporterFactory], classOf[WagonTransporterFactory])
     locator.getService(classOf[RepositorySystem])
   }
-  def newSessionImpl(system: RepositorySystem, localRepoDir: File)  = {
+  def newSessionImpl(system: RepositorySystem, localRepoDir: File) = {
     val session = MavenRepositorySystemUtils.newSession()
     val localRepo = new LocalRepository(localRepoDir.getAbsolutePath)
-    session setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo))
+    session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo))
     session
   }
-  
+
   def defaultLocalRepo: java.io.File = {
     import sbt._
-    (file(sys.props("user.home")) / ".m2" / "repository")
+    file(sys.props("user.home")) / ".m2" / "repository"
   }
-  
+
   def loadEffectivePom(pom: File, localRepo: File = defaultLocalRepo, profiles: Seq[String], userProps: Map[String, String]) =
     MavenPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles, userProps)
 }
