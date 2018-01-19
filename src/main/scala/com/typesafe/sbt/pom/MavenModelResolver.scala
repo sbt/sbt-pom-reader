@@ -43,7 +43,9 @@ class MavenModelResolver(
 
   override def addRepository(repository: Repository): Unit = addRepository(repository, false)
 
-  override def addRepository(repository: Repository, replace: Boolean): Unit = {
+  def resetRepositories(): Unit = _repositories = repositories
+
+  def addRepository(repository: Repository, replace: Boolean): Unit = {
     val exists = _repositories.exists(_.getId == repository.getId)
     if (!exists || replace) {
       // TODO - Should we use the remote repo manager?
