@@ -35,5 +35,5 @@ package object pom {
   }
   
   def loadEffectivePom(pom: File, localRepo: File = defaultLocalRepo, profiles: Seq[String], userProps: Map[String, String]) =
-    MvnPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles, userProps)
+    MavenPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles, userProps)
 }
