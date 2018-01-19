@@ -7,6 +7,8 @@ object Dependencies {
 
   val connectorBasic      = "org.apache.maven.resolver" % "maven-resolver-connector-basic" % mvnResolver
   val mvnEmbedder         = "org.apache.maven" % "maven-embedder" % mvnVersion exclude("com.google.guava", "guava") exclude("org.codehaus.plexus", "plexus-utils")
+  val transportFile       = "org.apache.maven.resolver" % "maven-resolver-transport-file" % mvnResolver
+  val transportHttp       = "org.apache.maven.resolver" % "maven-resolver-transport-http" % mvnResolver
   val transportWagon      = "org.apache.maven.resolver" % "maven-resolver-transport-wagon" % mvnResolver
 
   // These were explicitly added to resolve dependency conflicts in
@@ -21,6 +23,8 @@ object Dependencies {
      Seq(
       connectorBasic,
       mvnEmbedder,
+      transportFile,
+      transportHttp,
       transportWagon,
     ) ++ mvnEmbedderDeps
 }

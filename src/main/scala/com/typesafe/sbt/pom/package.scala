@@ -2,10 +2,12 @@ package com.typesafe.sbt
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
-import org.eclipse.aether.transport.wagon.{WagonProvider, WagonTransporterFactory}
 import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.repository.LocalRepository
 import org.eclipse.aether.DefaultRepositorySystemSession
+import org.eclipse.aether.transport.wagon.WagonTransporterFactory
+import org.eclipse.aether.transport.file.FileTransporterFactory
+import org.eclipse.aether.transport.http.HttpTransporterFactory
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
 import java.io.File
@@ -15,6 +17,8 @@ package object pom {
   def newRepositorySystemImpl: RepositorySystem = {
     val locator = MavenRepositorySystemUtils.newServiceLocator()
     locator.addService(classOf[RepositoryConnectorFactory], classOf[BasicRepositoryConnectorFactory])
+    locator.addService(classOf[TransporterFactory], classOf[FileTransporterFactory])
+    locator.addService(classOf[TransporterFactory], classOf[HttpTransporterFactory])
     locator.addService(classOf[TransporterFactory], classOf[WagonTransporterFactory])
     locator.getService(classOf[RepositorySystem])
   }
