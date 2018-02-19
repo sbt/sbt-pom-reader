@@ -14,25 +14,26 @@ import collection.JavaConverters._
 import java.util.Locale
 import org.apache.maven.model.resolution.ModelResolver
 
-object MvnPomResolver {
+object MavenPomResolver {
   val system = newRepositorySystemImpl
-  def apply(localRepo: File) = new MvnPomResolver(system, localRepo)
+  require(system != null, "Repository system failed to initialize")
+  def apply(localRepo: File) = new MavenPomResolver(system, localRepo)
 }
 
 
-class MvnPomResolver(system: RepositorySystem, localRepo: File) {
+class MavenPomResolver(system: RepositorySystem, localRepo: File) {
    val session = newSessionImpl(system, localRepo)
    
    private val modelBuilder = (new DefaultModelBuilderFactory).newInstance
    
    private val defaultRepositories: Seq[RemoteRepository] =
      Seq(
-       new RemoteRepository.Builder( "central", "default", " http://repo.maven.apache.org/maven2" ).build()
+       new RemoteRepository.Builder("central", "default", "http://repo.maven.apache.org/maven2").build()
      )
-   
+
    // TODO - Add repositories from the pom...
    val modelResolver: ModelResolver = {
-     new MyModelResolver(
+     new MavenModelResolver(
        session,
        system,
        repositories = defaultRepositories
