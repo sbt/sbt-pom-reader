@@ -16,7 +16,7 @@ import scala.util.Try
 
 /** Helper object to extract maven settings. */
 object MavenHelper {
-  
+
   // Load pom values into settings.
   val useMavenPom: Seq[Setting[_]] =
     loadPomInSettings ++ pullSettingsFromPom
@@ -32,16 +32,16 @@ object MavenHelper {
     showEffectivePom := showPom(pomLocation.value, effectivePom.value, streams.value),
     isJavaOnly := false
   )
-  
+
 
   // We Synchronize on System.out so aggregate logs don't interleave....
   def showPom(location: File, model: PomModel, s: TaskStreams): Unit = System.out.synchronized {
     s.log.info("---- Effective pom ("+location+") ----")
     serializePom(model).split("[\r\n]+") foreach { line =>
-      s.log.info(line)  
+      s.log.info(line)
     }
   }
-  
+
   def serializePom(pom: PomModel): String = {
     val out = new java.io.StringWriter
     val writer = new org.apache.maven.model.io.xpp3.MavenXpp3Writer
@@ -95,24 +95,24 @@ object MavenHelper {
     },
     credentials ++= createSbtCredentialsFromUserSettings(effectivePom.value, effectiveSettings.value)
   )
-  
+
   def fromPom[T](f: PomModel => T): Def.Initialize[T] =
     effectivePom apply f
-    
+
   // TODO - Use the sbt setting to configure this one...
   val supportedScalaGroupId = "org.scala-lang"
   val supportedScalaArtifacts =
     Seq("scala-library", "scala-library-all", "scala-actors", "scala-swing")
-  def getScalaVersionFromDependencies(pom: PomModel): Option[String] = { 
+  def getScalaVersionFromDependencies(pom: PomModel): Option[String] = {
       pom.getDependencies.asScala find { dep =>
         (dep.getGroupId  == supportedScalaGroupId) &&
         (supportedScalaArtifacts contains dep.getArtifactId)
       } map (_.getVersion)
   }
-  
+
   val scalaMavenPluginGroup = "net.alchim31.maven"
   val scalaMavenPluginId = "scala-maven-plugin"
-    
+
   // TODO - we need to detect which *variant* of a scala plugin is used,
   // whether it's confiugred for compiling/running/testing etc.
   def getScalaPlugin(pom: PomModel): Option[PomPlugin] = {
@@ -146,11 +146,11 @@ object MavenHelper {
       srcs <- Option(dom getChild "sources")
     } yield srcs.getChildren map (_.getValue)
 
-  def domOrNone(config: java.lang.Object): Option[org.codehaus.plexus.util.xml.Xpp3Dom] = 
+  def domOrNone(config: java.lang.Object): Option[org.codehaus.plexus.util.xml.Xpp3Dom] =
    if(config.isInstanceOf[org.codehaus.plexus.util.xml.Xpp3Dom]) {
      Some(config.asInstanceOf[org.codehaus.plexus.util.xml.Xpp3Dom])
    } else None
-  
+
   def readScalaPluginConfigurationFor(config: java.lang.Object, elem: String): Option[String] =
     for {
       dom <- domOrNone(config)
@@ -162,7 +162,7 @@ object MavenHelper {
       config <- Option(plugin.getConfiguration)
       version <- readScalaPluginConfigurationFor(config, "scalaVersion")
     } yield version
-  
+
   def readScalaPluginScalacArgsConfig(config: java.lang.Object): Option[Seq[String]] =
      for {
        dom <- domOrNone(config)
@@ -178,29 +178,29 @@ object MavenHelper {
       } yield opts
     discovered getOrElse Nil
   }
-  
-  def getScalaVersion(pom: PomModel): Option[String] = 
+
+  def getScalaVersion(pom: PomModel): Option[String] =
     getScalaVersionFromDependencies(pom) orElse
     getScalaVersionFromPlugins(pom)
-    
-  def getScalaVersionForced(pom: PomModel): String = 
-    getScalaVersion(pom) getOrElse 
+
+  def getScalaVersionForced(pom: PomModel): String =
+    getScalaVersion(pom) getOrElse
     sys.error("Could not find scala version in pom file.  Please depend on scala-library directly.")
-    
-  
+
+
   def convertDep(dep: PomDependency): sbt.ModuleID = {
     // TODO - Handle mapping all the maven oddities into sbt's DSL.
-    val scopeString: Option[String] = 
+    val scopeString: Option[String] =
       for {
         scope <- Option(dep.getScope)
       } yield scope
-      
+
     def fixScope(m: ModuleID): ModuleID =
       scopeString match {
         case Some(scope) => m % scope
         case None => m
       }
-      
+
     def addExclusions(mod: ModuleID): ModuleID = {
       val exclusions = dep.getExclusions.asScala
       exclusions.foldLeft(mod) { (mod, exclude) =>
@@ -215,13 +215,13 @@ object MavenHelper {
     }
     addExclusions(addClassifier(fixScope(dep.getGroupId % dep.getArtifactId % dep.getVersion)))
   }
-    
+
   def getDependencies(pom: PomModel): Seq[ModuleID] = {
     for {
       dep <- pom.getDependencies.asScala
     } yield convertDep(dep)
   }
-   
+
   def getPomResolvers(pom: PomModel): Seq[Resolver] = {
     for {
       repo <- pom.getRepositories.asScala
@@ -254,10 +254,10 @@ object MavenHelper {
     getServerRealm("PUT", uri) orElse
     getServerRealm("POST", uri)
   }
-  
+
   def getHost(uri: String): String =
     url(uri).getHost
-  
+
   def makeSbtCredentials(creds: Seq[(PomRepository, ServerCredentials)]) =
     for {
       (repo, cred) <- creds
@@ -265,8 +265,8 @@ object MavenHelper {
       realm <- getServerRealmSafe(repo.getUrl).map(Nil.::).getOrElse(Seq("Artifactory Realm","Sonatype Nexus Repository Manager"))
       host = getHost(repo.getUrl)
     } yield Credentials(realm, host, cred.user, cred.pw)
-    
-    
+
+
   def createSbtCredentialsFromUserSettings(pom: PomModel, effectiveSettings: Option[MavenSettings]): Seq[Credentials] = {
     for {
       settings ← effectiveSettings
@@ -274,9 +274,9 @@ object MavenHelper {
       matched = matchCredentialsWithServers(creds, pom)
     } yield makeSbtCredentials(matched)
   } getOrElse(Seq.empty)
-  
+
   // TODO - Pull resource directories from pom...
 
   // TODO - compiler plugins...
-  
+
 }

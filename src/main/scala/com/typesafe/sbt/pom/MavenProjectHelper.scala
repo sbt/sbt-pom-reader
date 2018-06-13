@@ -14,25 +14,25 @@ import collection.JavaConverters._
 /** This object knows how to load maven reactor projects and turn them into sbt projects. */
 object MavenProjectHelper {
   import MavenHelper.useMavenPom
-  
+
   def makeId(group: String, art: String, version: String): String =
     group+":"+art+":"+version
-  
+
   /** A way of treating projects as trees. */
   sealed trait ProjectTree {
     def model: PomModel
     def dir: File
-    
+
     // TODO - Keep version?
     lazy val id: String =
       makeId(model.getGroupId, model.getArtifactId, model.getVersion)
-      
-    def name: String = 
+
+    def name: String =
      model.getArtifactId
-      
+
     override def hashCode = id.hashCode
     override def toString = "Project("+id+")"
-    override def equals(that: Any): Boolean = 
+    override def equals(that: Any): Boolean =
       that match {
         case other: ProjectTree => id == other.id
         case _ => false
@@ -40,7 +40,7 @@ object MavenProjectHelper {
   }
   case class AggregateProject(model: PomModel, dir: File, children: Seq[ProjectTree]) extends ProjectTree
   case class SimpleProject(model: PomModel, dir: File) extends ProjectTree
-  
+
   def makeReactorProject(baseDir: File, overrideRootProjectName:Option[String] = None,
                          profiles: Seq[String], userProps: Map[String, String]): Seq[Project] = {
     // First create a tree of how things aggregate.
@@ -62,7 +62,7 @@ object MavenProjectHelper {
         val deps = getDepsFor(project)
         aggregates ++ deps
       }
-    def makeProjects(toMake: Seq[ProjectTree], made: Map[ProjectTree, Project] = Map.empty): Seq[Project] = 
+    def makeProjects(toMake: Seq[ProjectTree], made: Map[ProjectTree, Project] = Map.empty): Seq[Project] =
       toMake match {
         case current :: rest =>
           // Make a project, and add it to the stack
@@ -98,31 +98,31 @@ object MavenProjectHelper {
                   Keys.libraryDependencies.value.filterNot { dep =>
                     val id = makeId(dep.organization, dep.name, dep.revision)
                     depIds contains id
-                  }  
-                }     
+                  }
+                }
               )
-              
+
           )
           makeProjects(rest, made + (current -> currentProject))
         case Nil => made.values.toSeq
       }
     makeProjects(sorted)
   }
-  
+
   // TODO - Can we  pick a better name and does this need scrubbed?
   def makeProjectName(pom: PomModel, overrideName: Option[String]): String = {
     val pomName = Option(pom.getProperties.get("sbt.project.name").asInstanceOf[String])
     val directoryName = pom.getPomFile.getParentFile.getName
     overrideName.getOrElse(pomName.getOrElse(directoryName))
   }
-    
+
   def makeProjectTree(pomFile: File, profiles: Seq[String], userProps: Map[String, String]): ProjectTree = {
     val pom = loadEffectivePom(pomFile, profiles = profiles, userProps = userProps)
     val children = getChildProjectPoms(pom, pomFile) map (makeProjectTree(_, profiles, userProps))
     if(children.isEmpty) SimpleProject(pom, pomFile.getParentFile)
     else AggregateProject(pom, pomFile.getParentFile, children)
   }
-  
+
   // An unsorted walk of the tree
   def allProjectsInTree(tree: ProjectTree): Seq[ProjectTree] =
     tree match {
@@ -145,7 +145,7 @@ object MavenProjectHelper {
       }
     findDeps.toMap
   }
-  
+
   def getChildProjectPoms(pom: PomModel, pomFile: File): Seq[File] =
     for {
       childDirName <- Option(pom.getModules) map (_.asScala) getOrElse Nil
