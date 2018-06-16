@@ -1,14 +1,13 @@
-package com.typesafe.sbt.pom
+package com.typesafe.pom
 
-import org.apache.maven.model.building.{ FileModelSource, ModelSource }
-import org.apache.maven.model.resolution.{ ModelResolver, UnresolvableModelException }
-import org.apache.maven.model.{ Dependency, Parent, Repository }
-import org.eclipse.aether.RepositorySystemSession
+import org.apache.maven.model.building.{FileModelSource, ModelSource}
+import org.apache.maven.model.resolution.{ModelResolver, UnresolvableModelException}
+import org.apache.maven.model.{Dependency, Parent, Repository}
+import org.apache.maven.repository.internal.ArtifactDescriptorUtils
+import org.eclipse.aether.{RepositorySystem, RepositorySystemSession}
 import org.eclipse.aether.artifact.DefaultArtifact
 import org.eclipse.aether.repository.RemoteRepository
-import org.eclipse.aether.resolution.{ ArtifactRequest, ArtifactResolutionException }
-import org.apache.maven.repository.internal.ArtifactDescriptorUtils
-import org.eclipse.aether.RepositorySystem
+import org.eclipse.aether.resolution.{ArtifactRequest, ArtifactResolutionException}
 
 import scala.collection.JavaConverters._
 /**

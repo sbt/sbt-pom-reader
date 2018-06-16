@@ -11,5 +11,5 @@ object PomReaderPlugin extends AutoPlugin {
   }
   override def requires = JvmPlugin
   override def trigger = allRequirements
-  override lazy val projectSettings = MavenHelper.useMavenPom
+  override lazy val projectSettings = SbtMavenHelper.useMavenPom
 }
