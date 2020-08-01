@@ -48,7 +48,7 @@ object MavenProjectHelper {
     // Next flatten the list of all projects.
     val projects = allProjectsInTree(tree)
     // Create a mapping of all dependencies between projects.
-    val depMap = makeDependencyMap(projects)
+    val depMap: Map[ProjectTree, Seq[ProjectTree]] = makeDependencyMap(projects)
     // Helper to look up dependencies in the presence of absences.
     def getDepsFor(project: ProjectTree): Seq[ProjectTree] =
       depMap.getOrElse(project, Nil)
@@ -62,11 +62,11 @@ object MavenProjectHelper {
         val deps = getDepsFor(project)
         aggregates ++ deps
       }
-    def makeProjects(toMake: Seq[ProjectTree], made: Map[ProjectTree, Project] = Map.empty): Seq[Project] = 
+    def makeProjects(toMake: Seq[ProjectTree], made: Map[ProjectTree, (Project, ModuleID)] = Map.empty): Seq[Project] = 
       toMake match {
         case current :: rest =>
           // Make a project, and add it to the stack
-          val depProjects: Seq[Project] =
+          val depProjects: Seq[(Project, ModuleID)] =
             for {
               dep <- getDepsFor(current)
               depProject <- made.get(dep)
@@ -77,16 +77,32 @@ object MavenProjectHelper {
                 for {
                   child <- children
                   depProject <- made.get(child)
-                } yield depProject
+                } yield depProject._1
               case _ => Nil
             }
+          // Prepare data: 
+          // list of projects and their moduleIds with correct configurations,
+          // according to current node in POM we are processing now
+          val modulesMap: Map[String, Seq[ModuleID]] = 
+            MavenHelper
+              .getModuleDependencies(current.model)
+              .groupBy { m => makeId(m.organization, m.name, m.revision) }
+          val projectsMap: Map[String, Seq[(Project, ModuleID)]] = depProjects.groupBy { case (p, m) => makeId(m.organization, m.name, m.revision) }
+          val projectsWithModules: Seq[(Project, ModuleID)] = modulesMap.keySet.map { id =>
+              val mwc: Seq[ModuleID] = modulesMap.get(id).getOrElse(Seq.empty)
+              val projects: Seq[Project] = projectsMap.get(id).getOrElse(Seq.empty).map(_._1)
+              projects.zip(mwc)
+            }
+            .flatten
+            .toSeq
+
           // TODO - Configure debugging output....
-          val currentProject = (
-              Project(makeProjectName(current.model,overrideRootProjectName),current.dir)
+          val currentProject: Project = (
+              Project(makeProjectName(current.model,overrideRootProjectName), current.dir)
               // First pull in settings from pom
               settings(useMavenPom:_*)
-              // Now update depends on relationships
-              dependsOn(depProjects.map(x =>x: ClasspathDep[ProjectReference]):_*)
+              // Now update depends on relationships with actual configurations
+              dependsOn( projectsWithModules.map { case (p, m) => new ClasspathDependency(p, m.configurations) }: _* )
               // Now fix aggregate relationships
               aggregate(aggregates.map(x => x:ProjectReference):_*)
               // Now remove any inter-project dependencies we pulled in from the maven pom.
@@ -98,13 +114,13 @@ object MavenProjectHelper {
                   Keys.libraryDependencies.value.filterNot { dep =>
                     val id = makeId(dep.organization, dep.name, dep.revision)
                     depIds contains id
-                  }  
-                }     
+                  }
+                }
               )
-              
           )
-          makeProjects(rest, made + (current -> currentProject))
-        case Nil => made.values.toSeq
+          val currentModule = ModuleID(current.model.getGroupId, current.model.getArtifactId, current.model.getVersion)
+          makeProjects(rest, made + (current -> (currentProject, currentModule)))
+        case Nil => made.values.map(_._1).toSeq
       }
     makeProjects(sorted)
   }
