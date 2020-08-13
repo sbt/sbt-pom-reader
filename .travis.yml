@@ -1,8 +1,12 @@
+dist: trusty
+addons:
+  apt:
+    packages:
+      - openjdk-6-jdk
+jdk: openjdk6
 language: scala
 scala:
-   - 2.10.4
-jdk:
-   - openjdk6
+   - 2.10.6
    
 # Fix OpenJDK builds
 # https://github.com/travis-ci/travis-ci/issues/5227
