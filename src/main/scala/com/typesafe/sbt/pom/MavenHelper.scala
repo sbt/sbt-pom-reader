@@ -190,36 +190,63 @@ object MavenHelper {
   
   def convertDep(dep: PomDependency): sbt.ModuleID = {
     // TODO - Handle mapping all the maven oddities into sbt's DSL.
-    val scopeString: Option[String] = 
-      for {
-        scope <- Option(dep.getScope)
-      } yield scope
-      
-    def fixScope(m: ModuleID): ModuleID =
-      scopeString match {
-        case Some(scope) => m % scope
-        case None => m
-      }
-      
+    // See https://maven.apache.org/ref/3.6.3/maven-core/artifact-handlers.html for
+    // matrix on Maven side of attributes
     def addExclusions(mod: ModuleID): ModuleID = {
       val exclusions = dep.getExclusions.asScala
       exclusions.foldLeft(mod) { (mod, exclude) =>
         mod.exclude(exclude.getGroupId, exclude.getArtifactId)
       }
     }
+
     def addClassifier(mod: ModuleID): ModuleID = {
       Option(dep.getClassifier) match {
         case Some(_classifier) => mod classifier _classifier
         case None => mod
       }
     }
-    addExclusions(addClassifier(fixScope(dep.getGroupId % dep.getArtifactId % dep.getVersion)))
+
+    def addConfiguration(mod: ModuleID): ModuleID = {
+      val mvnScope = Option(dep.getScope)
+      val mvnType = Option(dep.getType)
+      val mvnClassifier = Option(dep.getClassifier)
+
+      (mvnScope, mvnType) match {
+        // <type>test-jar</type>
+        // <scope>SCOPE</scope>
+        case (Some(mScope), Some(mType)) if ("test-jar".equalsIgnoreCase(mType)) =>
+          mod
+            .withConfigurations(Some(s"${mScope}->test"))
+            .intransitive
+        // <classifier>tests</classifier>
+        // <scope>SCOPE</scope>
+        case (Some(mScope), _) if (mvnClassifier.getOrElse("").equalsIgnoreCase("tests")) =>
+          mod
+            .withConfigurations(Some(s"${mScope}->test"))
+        // <scope>SCOPE</scope>
+        case (Some(mScope), _) =>
+          mod % mScope
+        case _ => mod
+      }
+    }
+
+    // order does not matter
+    def conversion = addExclusions _ andThen addClassifier andThen addConfiguration
+
+    conversion(ModuleID(dep.getGroupId, dep.getArtifactId, dep.getVersion))
   }
-    
+
   def getDependencies(pom: PomModel): Seq[ModuleID] = {
     for {
       dep <- pom.getDependencies.asScala
     } yield convertDep(dep)
+  }
+
+  /** Filters module dependencies within same group id, which results in list
+   *  of modules this one depends on. */
+  def getModuleDependencies(pom: PomModel): Seq[ModuleID] = {
+    val allDependencies = getDependencies(pom)
+    allDependencies.filter { dep => dep.organization == pom.getGroupId }
   }
    
   def getPomResolvers(pom: PomModel): Seq[Resolver] = {
