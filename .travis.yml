@@ -1,15 +1,35 @@
 language: scala
-scala:
-   - 2.10.7
-jdk:
-   - openjdk8
-   
-# Fix OpenJDK builds
-# https://github.com/travis-ci/travis-ci/issues/5227
-sudo: false
 
-env:
-  - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256M -XX:MaxPermSize=512M"
+jdk: openjdk8
 
-script:
-  - sbt ++$TRAVIS_SCALA_VERSION --warn update compile scripted
+stages:
+  - name: test
+  - name: release
+    if: (tag IS present) AND NOT fork
+
+jobs:
+  include:
+    # stage="test" if no stage is specified
+    - name: jdk8
+      jdk: openjdk8
+    # - name: jdk11
+    #  jdk: openjdk11
+    # run ci-release only if previous stages passed
+    - stage: release
+      script: sbt ci-release
+
+before_install:
+  - git fetch --tags
+
+script: sbt clean test scripted
+
+before_cache:
+- find $HOME/.ivy2/cache     -name "ivydata-*.properties" -print -delete
+- find $HOME/.cache/coursier -name                        -print -delete
+- find $HOME/.sbt            -name "*.lock"               -print -delete
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.cache/coursier
+    - $HOME/.sbt
