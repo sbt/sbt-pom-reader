@@ -1,14 +1,7 @@
-val mvnVersion = "3.5.2"
-val mvnResolver = "1.1.0"
-// These were explicitly added to resolve dependency conflicts in
-// maven-embedder. Please keep these up-to-date, with the goal of
-// eventually removing them.
-val mvnEmbedderDeps = Seq(
-  "com.google.guava" % "guava" % "20.0",
-  "org.codehaus.plexus" % "plexus-utils" % "3.1.0"
-)
+val mvnVersion = "3.8.1"
+val mvnResolver = "1.6.2"
 
-ThisBuild  / organization := "com.typesafe.sbt"
+ThisBuild / organization := "com.typesafe.sbt"
 ThisBuild / dynverSonatypeSnapshots := true
 ThisBuild / version := {
   val orig = (ThisBuild / version).value
@@ -23,12 +16,12 @@ lazy val root = (project in file("."))
     name := "sbt-pom-reader"
     pluginCrossBuild / sbtVersion := "1.2.8"
     libraryDependencies ++= Seq(
-      "org.apache.maven" % "maven-embedder" % mvnVersion exclude("com.google.guava", "guava") exclude("org.codehaus.plexus", "plexus-utils"),
+      "org.apache.maven" % "maven-embedder" % mvnVersion,
       "org.apache.maven.resolver" % "maven-resolver-connector-basic" % mvnResolver,
       "org.apache.maven.resolver" % "maven-resolver-transport-file" % mvnResolver,
       "org.apache.maven.resolver" % "maven-resolver-transport-http" % mvnResolver,
       "org.apache.maven.resolver" % "maven-resolver-transport-wagon" % mvnResolver,
-    ) ++ mvnEmbedderDeps
+    )
     console / initialCommands :=
       """| import com.typesafe.sbt.pom._
          | import sbt._
@@ -37,9 +30,9 @@ lazy val root = (project in file("."))
          | val pom = loadEffectivePom(pomFile, localRepo, Seq.empty, Map.empty)
          |""".stripMargin
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
-    bintrayOrganization := Some("sbt")
-    bintrayRepository := "sbt-plugin-releases"
+    // bintrayOrganization := Some("sbt")
+    // bintrayRepository := "sbt-plugin-releases"
     // override sbt-ci-release
     publishMavenStyle := false
-    publishTo := (bintray / publishTo).value
+    // publishTo := (bintray / publishTo).value
   })
