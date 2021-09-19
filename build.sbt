@@ -8,15 +8,13 @@ val mvnEmbedderDeps = Seq(
   "org.codehaus.plexus" % "plexus-utils" % "3.1.0"
 )
 
-ThisBuild  / organization := "com.typesafe.sbt"
+ThisBuild / organization := "com.typesafe.sbt"
 ThisBuild / dynverSonatypeSnapshots := true
-ThisBuild / version := {
-  val orig = (ThisBuild / version).value
-  if (orig.endsWith("-SNAPSHOT")) "2.1.1-SNAPSHOT"
-  else orig
-}
 
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
+
+scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
+scriptedBufferLog := true
 
 lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
