@@ -1,36 +1,40 @@
-val mvnVersion = "3.5.2"
-val mvnResolver = "1.1.0"
-// These were explicitly added to resolve dependency conflicts in
-// maven-embedder. Please keep these up-to-date, with the goal of
-// eventually removing them.
-val mvnEmbedderDeps = Seq(
-  "com.google.guava" % "guava" % "20.0",
-  "org.codehaus.plexus" % "plexus-utils" % "3.1.0"
-)
-
 ThisBuild / organization := "com.typesafe.sbt"
-ThisBuild / dynverSonatypeSnapshots := true
+ThisBuild / licenses := Seq("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0"))
+ThisBuild / developers := List(Developer("", "", "", url("https://github.com/sbt/sbt-pom-reader/graphs/contributors")))
+ThisBuild / homepage := Some(url("https://github.com/sbt/sbt-pom-reader"))
 
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
-ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
+ThisBuild / githubWorkflowPublish := Seq(
+  WorkflowStep.Sbt(
+    List("ci-release"),
+    env = Map(
+      "PGP_PASSPHRASE" -> "${{ secrets.PGP_PASSPHRASE }}",
+      "PGP_SECRET" -> "${{ secrets.PGP_SECRET }}",
+      "SONATYPE_PASSWORD" -> "${{ secrets.SONATYPE_PASSWORD }}",
+      "SONATYPE_USERNAME" -> "${{ secrets.SONATYPE_USERNAME }}"
+    )
+  )
+)
 
-scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
-scriptedBufferLog := true
+val mvnVersion = "3.8.2"
+val mvnResolverVersion = "1.7.2"
 
 lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
-    licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))
     name := "sbt-pom-reader"
     pluginCrossBuild / sbtVersion := "1.2.8"
+
     libraryDependencies ++= Seq(
-      "org.apache.maven" % "maven-embedder" % mvnVersion exclude("com.google.guava", "guava") exclude("org.codehaus.plexus", "plexus-utils"),
-      "org.apache.maven.resolver" % "maven-resolver-connector-basic" % mvnResolver,
-      "org.apache.maven.resolver" % "maven-resolver-transport-file" % mvnResolver,
-      "org.apache.maven.resolver" % "maven-resolver-transport-http" % mvnResolver,
-      "org.apache.maven.resolver" % "maven-resolver-transport-wagon" % mvnResolver,
-    ) ++ mvnEmbedderDeps
+      "org.apache.maven" % "maven-embedder" % mvnVersion
+    ) ++ Seq(
+      "org.apache.maven.resolver" % "maven-resolver-connector-basic",
+      "org.apache.maven.resolver" % "maven-resolver-transport-file",
+      "org.apache.maven.resolver" % "maven-resolver-transport-http",
+      "org.apache.maven.resolver" % "maven-resolver-transport-wagon"
+    ).map (_ % mvnResolverVersion)
+
     console / initialCommands :=
       """| import com.typesafe.sbt.pom._
          | import sbt._
@@ -38,10 +42,8 @@ lazy val root = (project in file("."))
          | val pomFile = file("src/sbt-test/simple-pom/can-extract-basics/pom.xml")
          | val pom = loadEffectivePom(pomFile, localRepo, Seq.empty, Map.empty)
          |""".stripMargin
+
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
-    bintrayOrganization := Some("sbt")
-    bintrayRepository := "sbt-plugin-releases"
-    // override sbt-ci-release
-    publishMavenStyle := false
-    publishTo := (bintray / publishTo).value
+    scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
+    scriptedBufferLog := true
   })
