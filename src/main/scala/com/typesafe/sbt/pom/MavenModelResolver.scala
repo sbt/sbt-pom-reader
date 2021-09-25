@@ -1,6 +1,6 @@
 package com.typesafe.sbt.pom
 
-import org.apache.maven.model.building.{ FileModelSource, ModelSource }
+import org.apache.maven.model.building.{ FileModelSource, ModelSource2}
 import org.apache.maven.model.resolution.{ ModelResolver, UnresolvableModelException }
 import org.apache.maven.model.{ Dependency, Parent, Repository }
 import org.eclipse.aether.RepositorySystemSession
@@ -22,7 +22,7 @@ class MavenModelResolver(
 
   private[this] var _repositories: Seq[RemoteRepository] = repositories
 
-  override def resolveModel(groupId: String, artifactId: String, version: String): ModelSource = {
+  override def resolveModel(groupId: String, artifactId: String, version: String): ModelSource2 = {
     val pomArtifact =
       try {
         val tmp = new DefaultArtifact(groupId, artifactId, "", "pom", version)
@@ -35,10 +35,10 @@ class MavenModelResolver(
     new FileModelSource(pomArtifact.getFile)
   }
 
-  override def resolveModel(dependency: Dependency): ModelSource =
+  override def resolveModel(dependency: Dependency): ModelSource2 =
     resolveModel(dependency.getGroupId, dependency.getArtifactId, dependency.getVersion)
 
-  override def resolveModel(parent: Parent): ModelSource =
+  override def resolveModel(parent: Parent): ModelSource2 =
     resolveModel(parent.getGroupId, parent.getArtifactId, parent.getVersion)
 
   override def newCopy =
