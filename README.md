@@ -1,8 +1,7 @@
 # sbt pom reader plugin
 
-[![Join the chat at https://gitter.im/sbt/sbt-pom-reader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sbt/sbt-pom-reader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Build Status](https://travis-ci.org/sbt/sbt-pom-reader.svg?branch=master)](https://travis-ci.org/sbt/sbt-pom-reader)
+[![Build Status](https://github.com/sbt/sbt-pom-reader/actions/workflows/ci.yml/badge.svg)](https://github.com/sbt/sbt-pom-reader/actions)
+[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/sbt/sbt-pom-reader)](https://github.com/sbt/sbt-pom-reader/tags)
 
 This project aims to read Maven `pom.xml` files and configure a basic sbt project appropriately.  We have limited aims:
 
