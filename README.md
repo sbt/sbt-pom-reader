@@ -1,8 +1,7 @@
 # sbt pom reader plugin
 
-[![Join the chat at https://gitter.im/sbt/sbt-pom-reader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sbt/sbt-pom-reader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Build Status](https://travis-ci.org/sbt/sbt-pom-reader.svg?branch=master)](https://travis-ci.org/sbt/sbt-pom-reader)
+[![Build Status](https://github.com/sbt/sbt-pom-reader/actions/workflows/ci.yml/badge.svg)](https://github.com/sbt/sbt-pom-reader/actions)
+[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/sbt/sbt-pom-reader)](https://github.com/sbt/sbt-pom-reader/tags)
 
 This project aims to read Maven `pom.xml` files and configure a basic sbt project appropriately.  We have limited aims:
 
@@ -37,7 +36,7 @@ Each of the files should have the following contents.
 
 `project/build.properties`:
 
-    sbt.version=0.13.8
+    sbt.version=1.5.5
 
 `project/build.scala`:
 
@@ -46,12 +45,8 @@ Each of the files should have the following contents.
 
 `project/plugins.sbt`:
 
-     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "2.0.0")
-     
+     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "x.y.z")
 
-Note: Release candidate `2.1.0-RC2` is available, providing updates to the Maven/Wagon/Aether library versions. (Testing and bug reporting is appreciated!)
-
-     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "2.1.0-RC2")
 
 ## Configuring projects
 
