@@ -1,8 +1,22 @@
-ThisBuild / organization := "com.typesafe.sbt"
+val mvnVersion = "3.8.2"
+val mvnResolverVersion = "1.7.2"
+val scala212 = "2.12.17"
+// val scala210 = "2.10.7"
+
+ThisBuild / organization := "com.github.sbt"
 ThisBuild / licenses := Seq("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0"))
 ThisBuild / developers := List(Developer("", "", "", url("https://github.com/sbt/sbt-pom-reader/graphs/contributors")))
 ThisBuild / homepage := Some(url("https://github.com/sbt/sbt-pom-reader"))
+ThisBuild / dynverSonatypeSnapshots := true
+ThisBuild / version := {
+  val orig = (ThisBuild / version).value
+  if (orig.endsWith("-SNAPSHOT")) "2.2.0-SNAPSHOT"
+  else orig
+}
+ThisBuild / scalaVersion := scala212
+ThisBuild / crossScalaVersions := Seq(scala212)
 
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublish := Seq(
@@ -17,14 +31,10 @@ ThisBuild / githubWorkflowPublish := Seq(
   )
 )
 
-val mvnVersion = "3.8.2"
-val mvnResolverVersion = "1.7.2"
-
 lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
     name := "sbt-pom-reader"
-    pluginCrossBuild / sbtVersion := "1.2.8"
 
     libraryDependencies ++= Seq(
       "org.apache.maven" % "maven-embedder" % mvnVersion
@@ -46,4 +56,10 @@ lazy val root = (project in file("."))
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
     scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
     scriptedBufferLog := true
+    (pluginCrossBuild / sbtVersion) := {
+      scalaBinaryVersion.value match {
+        case "2.10" => "0.13.18"
+        case "2.12" => "1.2.8"
+      }
+    }
   })

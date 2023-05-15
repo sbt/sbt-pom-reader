@@ -1,1 +1,1 @@
-addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "2.1.0")
+addSbtPlugin("com.github.sbt" % "sbt-pom-reader" % sys.props("project.version"))

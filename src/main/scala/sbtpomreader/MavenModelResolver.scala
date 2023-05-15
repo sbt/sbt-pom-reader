@@ -1,6 +1,6 @@
-package com.typesafe.sbt.pom
+package sbtpomreader
 
-import org.apache.maven.model.building.{ FileModelSource, ModelSource2}
+import org.apache.maven.model.building.{ FileModelSource, ModelSource2 }
 import org.apache.maven.model.resolution.{ ModelResolver, UnresolvableModelException }
 import org.apache.maven.model.{ Dependency, Parent, Repository }
 import org.eclipse.aether.RepositorySystemSession
@@ -11,14 +11,16 @@ import org.apache.maven.repository.internal.ArtifactDescriptorUtils
 import org.eclipse.aether.RepositorySystem
 
 import scala.collection.JavaConverters._
+
 /**
  * We implement this because maven hides theirs.  RUN BUT YOU CAN'T HIDE, LITTLE MAVEN.
  */
 class MavenModelResolver(
-  session: RepositorySystemSession,
-  system: RepositorySystem,
-  context: String = "",
-  repositories: Seq[RemoteRepository] = Nil) extends ModelResolver {
+    session: RepositorySystemSession,
+    system: RepositorySystem,
+    context: String = "",
+    repositories: Seq[RemoteRepository] = Nil
+) extends ModelResolver {
 
   private[this] var _repositories: Seq[RemoteRepository] = repositories
 
@@ -29,7 +31,7 @@ class MavenModelResolver(
         val request = new ArtifactRequest(tmp, _repositories.asJava, context)
         system.resolveArtifact(session, request).getArtifact
       } catch {
-        case e: ArtifactResolutionException ⇒
+        case e: ArtifactResolutionException =>
           throw new UnresolvableModelException(e.getMessage, groupId, artifactId, version, e)
       }
     new FileModelSource(pomArtifact.getFile)
