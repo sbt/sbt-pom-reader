@@ -1,15 +1,16 @@
 package sbtpomreader
 
-import org.apache.maven.model.{Model ⇒ PomModel, Repository ⇒ PomRepository}
-import org.apache.maven.settings.building.{DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest}
-import org.apache.maven.settings.{Settings ⇒ MavenSettings}
+import org.apache.maven.model.{ Model => PomModel, Repository => PomRepository }
+import org.apache.maven.settings.building.{ DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest }
+import org.apache.maven.settings.{ Settings => MavenSettings }
 import sbt._
 
 import scala.collection.JavaConverters._
 
 /** Helper object with functions to extract settings from the user's
-  * Maven settings file (typically ~/.m2/settings.xml) */
+ * Maven settings file (typically ~/.m2/settings.xml) */
 object MavenUserSettingsHelper {
+
   /** Container for server credentials saved in the global settings. */
   case class ServerCredentials(id: String, user: String, pw: String)
 
@@ -43,7 +44,10 @@ object MavenUserSettingsHelper {
 
   /** Associates server credentials defined in the settings with repositories referenced in the POM. */
   // TODO - Grab authentication realm...
-  def matchCredentialsWithServers(creds: Seq[ServerCredentials], pom: PomModel): Seq[(PomRepository, ServerCredentials)] = {
+  def matchCredentialsWithServers(
+      creds: Seq[ServerCredentials],
+      pom: PomModel
+  ): Seq[(PomRepository, ServerCredentials)] = {
     // TODO: handle repos in settings.xml
     for {
       repo <- pom.getRepositories.asScala

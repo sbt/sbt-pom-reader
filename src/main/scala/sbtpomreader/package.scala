@@ -31,6 +31,11 @@ package object sbtpomreader {
     file(sys.props("user.home")) / ".m2" / "repository"
   }
 
-  def loadEffectivePom(pom: File, localRepo: File = defaultLocalRepo, profiles: Seq[String], userProps: Map[String, String]) =
+  def loadEffectivePom(
+      pom: File,
+      localRepo: File = defaultLocalRepo,
+      profiles: Seq[String],
+      userProps: Map[String, String]
+  ) =
     MavenPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles, userProps)
 }
