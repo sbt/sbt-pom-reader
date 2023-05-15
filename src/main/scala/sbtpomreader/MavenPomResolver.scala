@@ -1,4 +1,4 @@
-package com.typesafe.sbt.pom
+package sbtpomreader
 
 import org.eclipse.aether.repository.RemoteRepository
 import org.apache.maven.model.Model

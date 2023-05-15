@@ -1,5 +1,3 @@
-package com.typesafe.sbt
-
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.spi.connector.transport.TransporterFactory
@@ -12,7 +10,7 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
 import java.io.File
 
 /** Helper methods for dealing with starting up Aether. */
-package object pom {
+package object sbtpomreader {
   def newRepositorySystemImpl: RepositorySystem = {
     val locator = MavenRepositorySystemUtils.newServiceLocator()
     locator.addService(classOf[RepositoryConnectorFactory], classOf[BasicRepositoryConnectorFactory])

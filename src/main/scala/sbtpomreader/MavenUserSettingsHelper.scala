@@ -1,4 +1,4 @@
-package com.typesafe.sbt.pom
+package sbtpomreader
 
 import org.apache.maven.model.{Model ⇒ PomModel, Repository ⇒ PomRepository}
 import org.apache.maven.settings.building.{DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest}
@@ -29,18 +29,17 @@ object MavenUserSettingsHelper {
   def getUserResolvers(settings: MavenSettings): Seq[Resolver] = {
     val profiles = settings.getProfilesAsMap
     for {
-      profileName ← settings.getActiveProfiles.asScala
-      profile ← Option(profiles.get(profileName)).toSeq
-      repo ← profile.getRepositories.asScala
+      profileName <- settings.getActiveProfiles.asScala
+      profile <- Option(profiles.get(profileName)).toSeq
+      repo <- profile.getRepositories.asScala
     } yield repo.getId at repo.getUrl
   }
 
   /** Extract the server credentials from the given settings file. */
-  def serverCredentials(settings: MavenSettings): Seq[ServerCredentials] = {
+  def serverCredentials(settings: MavenSettings): Seq[ServerCredentials] =
     for {
-      s ← settings.getServers.asScala
+      s <- settings.getServers.asScala
     } yield ServerCredentials(s.getId, s.getUsername, s.getPassword)
-  }
 
   /** Associates server credentials defined in the settings with repositories referenced in the POM. */
   // TODO - Grab authentication realm...

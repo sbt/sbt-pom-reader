@@ -1,4 +1,4 @@
-package com.typesafe.sbt.pom
+package sbtpomreader
 
 import sbt._
 import Keys._

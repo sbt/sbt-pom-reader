@@ -1,4 +1,4 @@
-package com.typesafe.sbt.pom
+package sbtpomreader
 
 import sbt._
 import Keys._
@@ -296,7 +296,7 @@ object MavenHelper {
     
   def createSbtCredentialsFromUserSettings(pom: PomModel, effectiveSettings: Option[MavenSettings]): Seq[Credentials] = {
     for {
-      settings ← effectiveSettings
+      settings <- effectiveSettings
       creds = serverCredentials(settings)
       matched = matchCredentialsWithServers(creds, pom)
     } yield makeSbtCredentials(matched)

@@ -1,4 +1,4 @@
-package com.typesafe.sbt.pom
+package sbtpomreader
 
 import org.apache.maven.model.building.{ FileModelSource, ModelSource2}
 import org.apache.maven.model.resolution.{ ModelResolver, UnresolvableModelException }

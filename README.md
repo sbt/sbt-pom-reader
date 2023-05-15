@@ -45,7 +45,7 @@ Each of the files should have the following contents.
 
 `project/plugins.sbt`:
 
-     addSbtPlugin("com.typesafe.sbt" % "sbt-pom-reader" % "x.y.z")
+     addSbtPlugin("com.github.sbt" % "sbt-pom-reader" % "x.y.z")
 
 
 ## Configuring projects
