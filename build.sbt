@@ -1,3 +1,8 @@
+val mvnVersion = "3.8.2"
+val mvnResolverVersion = "1.7.2"
+val scala212 = "2.12.17"
+val scala210 = "2.10.7"
+
 ThisBuild / organization := "com.github.sbt"
 ThisBuild / licenses := Seq("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0"))
 ThisBuild / developers := List(Developer("", "", "", url("https://github.com/sbt/sbt-pom-reader/graphs/contributors")))
@@ -8,6 +13,8 @@ ThisBuild / version := {
   if (orig.endsWith("-SNAPSHOT")) "2.2.0-SNAPSHOT"
   else orig
 }
+ThisBuild / scalaVersion := scala212
+ThisBuild / crossScalaVersions := Seq(scala212, scala210)
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
@@ -23,9 +30,6 @@ ThisBuild / githubWorkflowPublish := Seq(
     )
   )
 )
-
-val mvnVersion = "3.8.2"
-val mvnResolverVersion = "1.7.2"
 
 lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
