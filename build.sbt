@@ -10,7 +10,7 @@ ThisBuild / homepage := Some(url("https://github.com/sbt/sbt-pom-reader"))
 ThisBuild / dynverSonatypeSnapshots := true
 ThisBuild / version := {
   val orig = (ThisBuild / version).value
-  if (orig.endsWith("-SNAPSHOT")) "2.2.0-SNAPSHOT"
+  if (orig.endsWith("-SNAPSHOT")) "2.5.0-SNAPSHOT"
   else orig
 }
 ThisBuild / scalaVersion := scala212
