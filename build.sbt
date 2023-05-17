@@ -16,21 +16,6 @@ ThisBuild / version := {
 ThisBuild / scalaVersion := scala212
 ThisBuild / crossScalaVersions := Seq(scala212)
 
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
-ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
-ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
-ThisBuild / githubWorkflowPublish := Seq(
-  WorkflowStep.Sbt(
-    List("ci-release"),
-    env = Map(
-      "PGP_PASSPHRASE" -> "${{ secrets.PGP_PASSPHRASE }}",
-      "PGP_SECRET" -> "${{ secrets.PGP_SECRET }}",
-      "SONATYPE_PASSWORD" -> "${{ secrets.SONATYPE_PASSWORD }}",
-      "SONATYPE_USERNAME" -> "${{ secrets.SONATYPE_USERNAME }}"
-    )
-  )
-)
-
 lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
@@ -43,7 +28,7 @@ lazy val root = (project in file("."))
       "org.apache.maven.resolver" % "maven-resolver-transport-file",
       "org.apache.maven.resolver" % "maven-resolver-transport-http",
       "org.apache.maven.resolver" % "maven-resolver-transport-wagon"
-    ).map (_ % mvnResolverVersion)
+    ).map(_ % mvnResolverVersion)
 
     console / initialCommands :=
       """| import com.typesafe.sbt.pom._
