@@ -16,11 +16,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         java: [8, 21]
-        include:
-        - java: 8
-          security_manager: ""
-        - java: 21
-          security_manager: "-Djava.security.manager=allow"
     runs-on: ${{ matrix.os }}
     env:
       # define Java options for both official sbt and sbt-extras
@@ -38,7 +33,7 @@ jobs:
           cache: 'sbt'
       - name: Test
         shell: bash
-        run: sbt ${{ matrix.security_manager }} -v clean test scripted
+        run: sbt -v clean test scripted
       - name: Ensure formatting
         shell: bash
-        run: sbt ${{ matrix.security_manager }} -v clean scalafmtSbtCheck scalafmtCheckAll
+        run: sbt -v clean scalafmtSbtCheck scalafmtCheckAll
