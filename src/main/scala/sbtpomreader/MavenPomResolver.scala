@@ -47,7 +47,7 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
   ): Model =
     try {
       val userProperties = new java.util.Properties()
-      userProperties.putAll(userPropsMap.asJava)
+      userPropsMap.foreach(kv => userProperties.put(kv._1, kv._2))
       val request = new DefaultModelBuildingRequest
       request setLocationTracking true
       request setProcessPlugins false
@@ -69,8 +69,8 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
 
   lazy val systemProperties = {
     val props = new java.util.Properties
-    props putAll envProperties.asJava
-    props putAll System.getProperties
+    envProperties.foreach(kv => props.put(kv._1, kv._2))
+    System.getProperties().asScala.foreach(kv => props.put(kv._1, kv._2))
     // TODO - Add more?
     props
   }
