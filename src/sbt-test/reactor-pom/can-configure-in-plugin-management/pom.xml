@@ -10,7 +10,7 @@
   </modules>
   
   <properties>
-    <scala.version>2.10.2</scala.version>
+    <scala.version>2.13.13</scala.version>
     <scala.plugin.version>3.1.5</scala.plugin.version>
   </properties>
   
@@ -26,7 +26,7 @@
             <recompileMode>incremental</recompileMode>
             <useZincServer>true</useZincServer>
             <args>
-              <arg>-target:jvm-1.6</arg>
+              <arg>-target:8</arg>
               <arg>-feature</arg>
               <arg>-language:_</arg>
               <arg>-deprecation</arg>
@@ -34,17 +34,15 @@
               <arg>-optimise</arg>
               <arg>-encoding</arg>
               <arg>UTF-8</arg>
-              <arg>-Yclosure-elim</arg>
-              <arg>-Yinline</arg>
-              <arg>-Yinline-warnings</arg>
+              <arg>-nowarn</arg>
             </args>
             <javacArgs>
               <javacArg>-source</javacArg>
-              <javacArg>1.6</javacArg>
+              <javacArg>1.8</javacArg>
               <javacArg>-Xlint:-options</javacArg>
               <javacArg>-deprecation</javacArg>
               <javacArg>-target</javacArg>
-              <javacArg>1.6</javacArg>
+              <javacArg>1.8</javacArg>
             </javacArgs>
             <jvmArgs>
               <jvmArg>-Xmx768m</jvmArg>
@@ -81,12 +79,12 @@
   	  <dependency>
   	    <groupId>org.scala-lang</groupId>
   	    <artifactId>scala-library</artifactId>
-  	    <version>2.10.2</version>
+  	    <version>2.13.13</version>
   	  </dependency>
   	  <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_2.10</artifactId>
-        <version>2.0.M6-SNAP28</version>
+        <artifactId>scalatest_2.13</artifactId>
+        <version>3.2.18</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
