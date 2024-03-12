@@ -1,7 +1,6 @@
 val mvnVersion = "3.8.2"
 val mvnResolverVersion = "1.7.2"
-val scala212 = "2.12.17"
-// val scala210 = "2.10.7"
+val scala212 = "2.12.19"
 
 ThisBuild / organization := "com.github.sbt"
 ThisBuild / licenses := Seq("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0"))
@@ -41,10 +40,5 @@ lazy val root = (project in file("."))
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
     scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
     scriptedBufferLog := true
-    (pluginCrossBuild / sbtVersion) := {
-      scalaBinaryVersion.value match {
-        case "2.10" => "0.13.18"
-        case "2.12" => "1.2.8"
-      }
-    }
+    (pluginCrossBuild / sbtVersion) := "1.2.8"
   })
