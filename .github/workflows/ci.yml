@@ -38,7 +38,7 @@ jobs:
           cache: 'sbt'
       - name: Test
         shell: bash
-        run: sbt ${{ matric.security_manager }} -v clean test scripted
+        run: sbt ${{ matrix.security_manager }} -v clean test scripted
       - name: Ensure formatting
         shell: bash
-        run: sbt ${{ matric.security_manager }} -v clean scalafmtSbtCheck scalafmtCheckAll
+        run: sbt ${{ matrix.security_manager }} -v clean scalafmtSbtCheck scalafmtCheckAll
