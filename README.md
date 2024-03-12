@@ -36,17 +36,22 @@ Each of the files should have the following contents.
 
 `project/build.properties`:
 
-    sbt.version=1.5.5
+    sbt.version=1.9.9
 
 `project/build.scala`:
 
     import sbt._
-    object MyBuild extends com.typesafe.sbt.pom.PomBuild
+    object MyBuild extends sbtpomreader.PomBuild
 
 `project/plugins.sbt`:
 
      addSbtPlugin("com.github.sbt" % "sbt-pom-reader" % "x.y.z")
 
+NB: for sbt 0.13.x please use the plugin version prior to 2.5.0, as it is not supported anymore
+
+`project/plugins.sbt`:
+
+     addSbtPlugin("com.github.sbt" % "sbt-pom-reader" % "2.4.0")
 
 ## Configuring projects
 
