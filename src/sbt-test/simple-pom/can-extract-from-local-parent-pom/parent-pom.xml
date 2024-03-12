@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <scala.version>2.10.2</scala.version>
+    <scala.version>2.13.13</scala.version>
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
   </properties>

@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <scala.version>2.10.2</scala.version>
+    <scala.version>2.13.13</scala.version>
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
   </properties>
@@ -19,16 +19,16 @@
     </dependency>
     <dependency>
       <groupId>com.twitter</groupId>
-      <artifactId>bijection-core_2.10</artifactId>
-      <version>0.5.0</version>
+      <artifactId>bijection-core_2.13</artifactId>
+      <version>0.9.7</version>
       <exclusions>
         <exclusion>
           <groupId>org.scalacheck</groupId>
-          <artifactId>scalacheck_2.10</artifactId>
+          <artifactId>scalacheck_2.13</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.scala-tools.testing</groupId>
-          <artifactId>specs_2.10</artifactId>
+          <artifactId>specs_2.13</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -67,7 +67,7 @@
   <repositories>
     <repository>
       <id>DUMMY-REPO</id>
-      <url>http://my-dum-repo.org</url>
+      <url>https://my-dum-repo.org</url>
     </repository>
     <repository>
       <id>sonatype-nexus</id>

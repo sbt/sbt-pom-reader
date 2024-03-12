@@ -1,4 +1,3 @@
-
 settingsLocation := baseDirectory.value / "non-existent-file.xml"
 
 TaskKey[Unit]("checkSettings") := {
@@ -14,9 +13,12 @@ TaskKey[Unit]("checkSettings") := {
   }
   testSetting(name, "test-project")
   testSetting(version, "1.0-SNAPSHOT")
-  testSetting(scalaVersion, "2.10.2")
+  testSetting(scalaVersion, "2.13.13")
   testSetting(organization, "com.jsuereth.junk")
   val expectedFile = baseDirectory.value / "non-existent-file.xml"
   testSetting(settingsLocation, expectedFile)
-  assert(!expectedFile.exists(), "File can't exist if I'm to test handling non-existence. Please delete " + expectedFile)
+  assert(
+    !expectedFile.exists(),
+    "File can't exist if I'm to test handling non-existence. Please delete " + expectedFile
+  )
 }

@@ -1,10 +1,12 @@
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers._
 
-class MainTest extends FunSuite with Matchers {
-
+class MainTest extends AnyFunSuite with Matchers {
 
   test("hi shouldbe hi") {
-    Main.hi should be ("hi")
+    Main.hi should be("hi")
   }
 
 }
+

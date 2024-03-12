@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.gemelen.example</groupId>
-  <artifactId>core_2.12</artifactId>
+  <artifactId>core_2.13</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
 
   <parent>
     <groupId>net.gemelen.example</groupId>
-    <artifactId>example-parent_2.12</artifactId>
+    <artifactId>example-parent_2.13</artifactId>
     <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
