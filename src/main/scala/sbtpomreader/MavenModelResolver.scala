@@ -1,19 +1,19 @@
 package sbtpomreader
 
+import scala.collection.JavaConverters._
+
+import org.apache.maven.model.{ Dependency, Parent, Repository }
 import org.apache.maven.model.building.{ FileModelSource, ModelSource2 }
 import org.apache.maven.model.resolution.{ ModelResolver, UnresolvableModelException }
-import org.apache.maven.model.{ Dependency, Parent, Repository }
+import org.apache.maven.repository.internal.ArtifactDescriptorUtils
+import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
 import org.eclipse.aether.artifact.DefaultArtifact
 import org.eclipse.aether.repository.RemoteRepository
 import org.eclipse.aether.resolution.{ ArtifactRequest, ArtifactResolutionException }
-import org.apache.maven.repository.internal.ArtifactDescriptorUtils
-import org.eclipse.aether.RepositorySystem
-
-import scala.collection.JavaConverters._
 
 /**
- * We implement this because maven hides theirs.  RUN BUT YOU CAN'T HIDE, LITTLE MAVEN.
+ * We implement this because maven hides theirs. RUN BUT YOU CAN'T HIDE, LITTLE MAVEN.
  */
 class MavenModelResolver(
     session: RepositorySystemSession,

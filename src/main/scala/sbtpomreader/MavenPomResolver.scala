@@ -1,18 +1,20 @@
 package sbtpomreader
 
-import org.eclipse.aether.repository.RemoteRepository
-import org.apache.maven.model.Model
-import org.eclipse.aether.RepositorySystem
 import java.io.File
-import org.apache.maven.model.building.{
-  DefaultModelBuildingRequest,
-  ModelBuildingRequest,
-  ModelBuildingException,
-  DefaultModelBuilderFactory
-}
-import collection.JavaConverters._
 import java.util.Locale
+
+import scala.collection.JavaConverters._
+
+import org.apache.maven.model.Model
+import org.apache.maven.model.building.{
+  DefaultModelBuilderFactory,
+  DefaultModelBuildingRequest,
+  ModelBuildingException,
+  ModelBuildingRequest
+}
 import org.apache.maven.model.resolution.ModelResolver
+import org.eclipse.aether.RepositorySystem
+import org.eclipse.aether.repository.RemoteRepository
 
 object MavenPomResolver {
   val system = newRepositorySystemImpl

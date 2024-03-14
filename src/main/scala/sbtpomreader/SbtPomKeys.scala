@@ -1,6 +1,7 @@
 package sbtpomreader
 
 import sbt._
+
 import org.apache.maven.model.Model
 import org.apache.maven.settings.{ Settings => MavenSettings }
 

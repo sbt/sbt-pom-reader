@@ -1,14 +1,16 @@
 package sbtpomreader
 
-import org.apache.maven.model.{ Model => PomModel, Repository => PomRepository }
-import org.apache.maven.settings.building.{ DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest }
-import org.apache.maven.settings.{ Settings => MavenSettings }
 import sbt._
 
 import scala.collection.JavaConverters._
 
-/** Helper object with functions to extract settings from the user's
- * Maven settings file (typically ~/.m2/settings.xml) */
+import org.apache.maven.model.{ Model => PomModel, Repository => PomRepository }
+import org.apache.maven.settings.{ Settings => MavenSettings }
+import org.apache.maven.settings.building.{ DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest }
+
+/**
+ * Helper object with functions to extract settings from the user's Maven settings file (typically ~/.m2/settings.xml)
+ */
 object MavenUserSettingsHelper {
 
   /** Container for server credentials saved in the global settings. */
