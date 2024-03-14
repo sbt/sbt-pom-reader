@@ -3,8 +3,8 @@ package sbtpomreader
 import sbt._
 import sbt.internal.BuildDef
 
-/** A helper class that allows us to load all maven reactor projects
- *  upon boot.
+/**
+ * A helper class that allows us to load all maven reactor projects upon boot.
  */
 trait PomBuild extends BuildDef {
   val profiles: Seq[String] = Seq()

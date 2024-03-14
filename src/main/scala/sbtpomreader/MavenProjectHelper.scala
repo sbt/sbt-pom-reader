@@ -1,15 +1,18 @@
 package sbtpomreader
 
+import sbtpomreader.SbtPomKeys._
+
 import sbt._
-import Keys._
+import sbt.Keys._
+
+import scala.collection.JavaConverters._
+
 import org.apache.maven.model.{
+  Dependency => PomDependency,
   Model => PomModel,
   Plugin => PomPlugin,
-  Dependency => PomDependency,
   Repository => PomRepository
 }
-import SbtPomKeys._
-import collection.JavaConverters._
 
 /** This object knows how to load maven reactor projects and turn them into sbt projects. */
 object MavenProjectHelper {
@@ -93,8 +96,8 @@ object MavenProjectHelper {
               .groupBy { m =>
                 makeId(m.organization, m.name, m.revision)
               }
-          val projectsMap: Map[String, Seq[(Project, ModuleID)]] = depProjects.groupBy {
-            case (p, m) => makeId(m.organization, m.name, m.revision)
+          val projectsMap: Map[String, Seq[(Project, ModuleID)]] = depProjects.groupBy { case (p, m) =>
+            makeId(m.organization, m.name, m.revision)
           }
           val projectsWithModules: Seq[(Project, ModuleID)] = modulesMap.keySet
             .map { id =>
@@ -110,13 +113,13 @@ object MavenProjectHelper {
             Project(makeProjectName(current.model, overrideRootProjectName), current.dir)
             // First pull in settings from pom
               settings (useMavenPom: _*)
-            // Now update depends on relationships with actual configurations
+              // Now update depends on relationships with actual configurations
               dependsOn (projectsWithModules.map { case (p, m) => new ClasspathDependency(p, m.configurations) }: _*)
-            // Now fix aggregate relationships
+              // Now fix aggregate relationships
               aggregate (aggregates.map(x => x: ProjectReference): _*)
-            // Now remove any inter-project dependencies we pulled in from the maven pom.
-            // TODO - Maybe we can fix the useMavenPom settings so we don't need to
-            // post-filter artifacts?
+              // Now remove any inter-project dependencies we pulled in from the maven pom.
+              // TODO - Maybe we can fix the useMavenPom settings so we don't need to
+              // post-filter artifacts?
               settings (
                 Keys.libraryDependencies := {
                   val depIds = getDepsFor(current).map(_.id).toSet

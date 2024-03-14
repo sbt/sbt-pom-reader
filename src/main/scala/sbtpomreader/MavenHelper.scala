@@ -1,18 +1,21 @@
 package sbtpomreader
 
+import sbtpomreader.MavenUserSettingsHelper._
+import sbtpomreader.SbtPomKeys._
+
 import sbt._
-import Keys._
+import sbt.Keys._
+
+import scala.collection.JavaConverters._
+import scala.util.Try
+
 import org.apache.maven.model.{
+  Dependency => PomDependency,
   Model => PomModel,
   Plugin => PomPlugin,
-  Dependency => PomDependency,
   Repository => PomRepository
 }
 import org.apache.maven.settings.{ Settings => MavenSettings }
-import SbtPomKeys._
-import collection.JavaConverters._
-import MavenUserSettingsHelper._
-import scala.util.Try
 
 /** Helper object to extract maven settings. */
 object MavenHelper {
@@ -242,8 +245,9 @@ object MavenHelper {
     } yield convertDep(dep)
   }
 
-  /** Filters module dependencies within same group id, which results in list
-   *  of modules this one depends on. */
+  /**
+   * Filters module dependencies within same group id, which results in list of modules this one depends on.
+   */
   def getModuleDependencies(pom: PomModel): Seq[ModuleID] = {
     val allDependencies = getDependencies(pom)
     allDependencies.filter { dep =>
@@ -259,8 +263,10 @@ object MavenHelper {
     } yield repo.getId at repo.getUrl
   }
 
-  /** Attempts to perform an unathorized action so we can detect the supported
-   * authentication realms of our server.  tested against nexus + artifactory. */
+  /**
+   * Attempts to perform an unathorized action so we can detect the supported authentication realms of our server.
+   * tested against nexus + artifactory.
+   */
   def getServerRealm(method: String, uri: String): Option[String] = {
     // This is consigned to a Try until proper handling of offline mode.
     Try {
@@ -295,7 +301,10 @@ object MavenHelper {
       host = getHost(repo.getUrl)
     } yield Credentials(realm, host, cred.user, cred.pw)
 
-  def createSbtCredentialsFromUserSettings(pom: PomModel, effectiveSettings: Option[MavenSettings]): Seq[Credentials] = {
+  def createSbtCredentialsFromUserSettings(
+      pom: PomModel,
+      effectiveSettings: Option[MavenSettings]
+  ): Seq[Credentials] = {
     for {
       settings <- effectiveSettings
       creds = serverCredentials(settings)
