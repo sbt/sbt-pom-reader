@@ -19,6 +19,11 @@ lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
     name := "sbt-pom-reader"
+    scalacOptions := Seq(
+      "-Wconf:any:wv",
+      "-Xlint:unused",
+      "-Xlint:deprecation"
+    )
 
     libraryDependencies ++= Seq(
       "org.apache.maven" % "maven-embedder" % mvnVersion
