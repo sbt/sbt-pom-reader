@@ -1,18 +1,10 @@
 package sbtpomreader
 
-import sbtpomreader.SbtPomKeys._
-
 import sbt._
-import sbt.Keys._
 
 import scala.collection.JavaConverters._
 
-import org.apache.maven.model.{
-  Dependency => PomDependency,
-  Model => PomModel,
-  Plugin => PomPlugin,
-  Repository => PomRepository
-}
+import org.apache.maven.model.{ Model => PomModel }
 
 /** This object knows how to load maven reactor projects and turn them into sbt projects. */
 object MavenProjectHelper {

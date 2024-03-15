@@ -2,14 +2,8 @@ import java.io.File
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
 import org.eclipse.aether.repository.LocalRepository
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
-import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.supplier.RepositorySystemSupplier
-import org.eclipse.aether.transport.file.FileTransporterFactory
-import org.eclipse.aether.transport.http.HttpTransporterFactory
-import org.eclipse.aether.transport.wagon.WagonTransporterFactory
 
 /** Helper methods for dealing with starting up Aether. */
 package object sbtpomreader {
