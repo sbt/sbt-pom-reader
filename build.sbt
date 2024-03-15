@@ -24,6 +24,7 @@ lazy val root = (project in file("."))
       "org.apache.maven" % "maven-embedder" % mvnVersion
     ) ++ Seq(
       "org.apache.maven.resolver" % "maven-resolver-connector-basic",
+      "org.apache.maven.resolver" % "maven-resolver-supplier",
       "org.apache.maven.resolver" % "maven-resolver-transport-file",
       "org.apache.maven.resolver" % "maven-resolver-transport-http",
       "org.apache.maven.resolver" % "maven-resolver-transport-wagon"
