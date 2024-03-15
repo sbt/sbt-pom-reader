@@ -1,5 +1,5 @@
-val mvnVersion = "3.8.2"
-val mvnResolverVersion = "1.7.2"
+val mvnVersion = "3.9.4"
+val mvnResolverVersion = "1.9.18"
 val scala212 = "2.12.19"
 
 ThisBuild / organization := "com.github.sbt"
