@@ -2,24 +2,14 @@ import java.io.File
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
 import org.eclipse.aether.repository.LocalRepository
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
-import org.eclipse.aether.spi.connector.transport.TransporterFactory
-import org.eclipse.aether.transport.file.FileTransporterFactory
-import org.eclipse.aether.transport.http.HttpTransporterFactory
-import org.eclipse.aether.transport.wagon.WagonTransporterFactory
+import org.eclipse.aether.supplier.RepositorySystemSupplier
 
 /** Helper methods for dealing with starting up Aether. */
 package object sbtpomreader {
-  def newRepositorySystemImpl: RepositorySystem = {
-    val locator = MavenRepositorySystemUtils.newServiceLocator()
-    locator.addService(classOf[RepositoryConnectorFactory], classOf[BasicRepositoryConnectorFactory])
-    locator.addService(classOf[TransporterFactory], classOf[FileTransporterFactory])
-    locator.addService(classOf[TransporterFactory], classOf[HttpTransporterFactory])
-    locator.addService(classOf[TransporterFactory], classOf[WagonTransporterFactory])
-    locator.getService(classOf[RepositorySystem])
-  }
+  def newRepositorySystemImpl: RepositorySystem =
+    this.synchronized[RepositorySystem](new RepositorySystemSupplier().get())
+
   def newSessionImpl(system: RepositorySystem, localRepoDir: File) = {
     val session = MavenRepositorySystemUtils.newSession()
     val localRepo = new LocalRepository(localRepoDir.getAbsolutePath)

@@ -80,10 +80,10 @@ object MavenHelper {
         scalaVersion.value
       }
     },
-    unmanagedSourceDirectories in Compile ++= {
+    Compile / unmanagedSourceDirectories ++= {
       getAdditionalSourcesFromPlugin(effectivePom.value).filterNot(_.contains("test")).map(x => baseDirectory.value / x)
     },
-    unmanagedSourceDirectories in Test ++= {
+    Test / unmanagedSourceDirectories ++= {
       getAdditionalSourcesFromPlugin(effectivePom.value).filter(_.contains("test")).map(x => baseDirectory.value / x)
     },
     libraryDependencies ++= fromPom(getDependencies).value,

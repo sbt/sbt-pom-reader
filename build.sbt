@@ -1,5 +1,5 @@
-val mvnVersion = "3.8.2"
-val mvnResolverVersion = "1.7.2"
+val mvnVersion = "3.9.4"
+val mvnResolverVersion = "1.9.18"
 val scala212 = "2.12.19"
 
 ThisBuild / organization := "com.github.sbt"
@@ -19,11 +19,17 @@ lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
     name := "sbt-pom-reader"
+    scalacOptions := Seq(
+      "-Wconf:any:wv",
+      "-Xlint:unused",
+      "-Xlint:deprecation"
+    )
 
     libraryDependencies ++= Seq(
       "org.apache.maven" % "maven-embedder" % mvnVersion
     ) ++ Seq(
       "org.apache.maven.resolver" % "maven-resolver-connector-basic",
+      "org.apache.maven.resolver" % "maven-resolver-supplier",
       "org.apache.maven.resolver" % "maven-resolver-transport-file",
       "org.apache.maven.resolver" % "maven-resolver-transport-http",
       "org.apache.maven.resolver" % "maven-resolver-transport-wagon"
@@ -39,6 +45,6 @@ lazy val root = (project in file("."))
 
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
     scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
-    scriptedBufferLog := false
+    scriptedBufferLog := true
     scriptedSbt := "1.9.9"
   })
