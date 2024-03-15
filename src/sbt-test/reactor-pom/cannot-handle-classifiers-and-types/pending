@@ -1,3 +1,0 @@
-# run test and expect failure
-> parent/compile
--> parent/Test/compile
