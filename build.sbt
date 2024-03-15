@@ -39,6 +39,6 @@ lazy val root = (project in file("."))
 
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
     scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
-    scriptedBufferLog := false
+    scriptedBufferLog := true
     scriptedSbt := "1.9.9"
   })
