@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
-    tags: ['*']
+    tags: ['**']
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -14,27 +14,31 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        java: ['temurin:8', 'temurin:21']
+        include:
+          - os: ubuntu-latest
+            java: 8
+            distribution: zulu
+          - os: ubuntu-latest
+            java: 21
+            distribution: temurin
     runs-on: ${{ matrix.os }}
     env:
       # define Java options for both official sbt and sbt-extras
-      JAVA_OPTS: -Dfile.encoding=UTF-8
-      JVM_OPTS:  -Dfile.encoding=UTF-8
-      ADDITIONAL_JVM_OPTS: -Djava.security.manager=allow
+      JAVA_OPTS: -Dfile.encoding=UTF-8 -Djava.security.manager=allow
+      JVM_OPTS:  -Dfile.encoding=UTF-8 -Djava.security.manager=allow
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup cache
-        uses: coursier/cache-action@v6
-      - name: Setup jdk and sbt
-        uses: coursier/setup-action@v1
+        uses: actions/checkout@v5
+      - name: Setup JDK
+        uses: actions/setup-java@v5
         with:
-          jvm: ${{ matrix.java }}
-          apps: sbt
+          distribution: "${{ matrix.distribution }}"
+          java-version: "${{ matrix.java }}"
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
       - name: Test
         shell: bash
-        run: sbt -v clean test scripted
+        run: sbt -v clean +test +scripted
       - name: Ensure formatting
         shell: bash
         run: sbt -v clean scalafmtSbtCheck scalafmtCheckAll

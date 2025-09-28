@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-    tags: ['*']
+    tags: ['**']
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -13,16 +13,16 @@ jobs:
       JVM_OPTS:  -Dfile.encoding=UTF-8
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Setup cache
-        uses: coursier/cache-action@v6
-      - name: Setup jdk and sbt
-        uses: coursier/setup-action@v1
+      - name: Setup JDK
+        uses: actions/setup-java@v5
         with:
-          jvm: 'temurin:8'
-          apps: sbt
+          distribution: "zulu"
+          java-version: "8"
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
       - name: Release
         run: sbt ci-release
         env:
