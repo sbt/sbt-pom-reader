@@ -3,7 +3,7 @@ val mvnResolverVersion = "1.9.18"
 val scala212 = "2.12.20"
 
 ThisBuild / organization := "com.github.sbt"
-ThisBuild / licenses := Seq("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0"))
+ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(Developer("", "", "", url("https://github.com/sbt/sbt-pom-reader/graphs/contributors")))
 ThisBuild / homepage := Some(url("https://github.com/sbt/sbt-pom-reader"))
 ThisBuild / dynverSonatypeSnapshots := true
@@ -19,7 +19,7 @@ lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
     name := "sbt-pom-reader"
-    scalacOptions := Seq(
+    scalacOptions ++= Seq(
       "-Wconf:any:wv",
       "-Xlint:unused",
       "-Xlint:deprecation"
@@ -46,5 +46,16 @@ lazy val root = (project in file("."))
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
     scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
     scriptedBufferLog := true
-    scriptedSbt := "1.9.9"
+    (pluginCrossBuild / sbtVersion) := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.9.9"
+        case _      => "2.0.0-RC5"
+      }
+    }
+    scriptedSbt := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.11.6"
+        case _      => (pluginCrossBuild / sbtVersion).value
+      }
+    }
   })
