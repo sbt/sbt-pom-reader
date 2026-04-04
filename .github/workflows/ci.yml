@@ -27,8 +27,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       # define Java options for both official sbt and sbt-extras
-      JAVA_OPTS: -server -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED
-      JVM_OPTS:  -server -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED
+      JAVA_OPTS: -server -Dfile.encoding=UTF-8
+      JVM_OPTS:  -server -Dfile.encoding=UTF-8
     steps:
       - name: Checkout
         uses: actions/checkout@v6
