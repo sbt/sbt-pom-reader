@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # define Java options for both official sbt and sbt-extras
-      JAVA_OPTS: -Dfile.encoding=UTF-8
-      JVM_OPTS:  -Dfile.encoding=UTF-8
+      JAVA_OPTS: -server -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED
+      JVM_OPTS:  -server -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Setup JDK
