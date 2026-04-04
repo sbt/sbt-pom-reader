@@ -1,6 +1,6 @@
 package sbtpomreader
 
-import sbt._
+import sbt.*
 import sbt.internal.BuildDef
 
 /**

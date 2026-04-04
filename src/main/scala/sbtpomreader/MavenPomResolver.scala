@@ -3,7 +3,7 @@ package sbtpomreader
 import java.io.File
 import java.util.Locale
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 import org.apache.maven.model.Model
 import org.apache.maven.model.building.{

@@ -18,7 +18,7 @@ package object sbtpomreader {
   }
 
   def defaultLocalRepo: java.io.File = {
-    import sbt._
+    import sbt.*
     file(sys.props("user.home")) / ".m2" / "repository"
   }
 

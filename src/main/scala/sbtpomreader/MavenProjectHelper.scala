@@ -1,10 +1,10 @@
 package sbtpomreader
 
-import sbt._
+import sbt.*
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
-import org.apache.maven.model.{ Model => PomModel }
+import org.apache.maven.model.Model as PomModel
 
 /** This object knows how to load maven reactor projects and turn them into sbt projects. */
 object MavenProjectHelper {
@@ -104,11 +104,11 @@ object MavenProjectHelper {
           val currentProject: Project = (
             Project(makeProjectName(current.model, overrideRootProjectName), current.dir)
             // First pull in settings from pom
-              settings (useMavenPom: _*)
+              settings (useMavenPom*)
               // Now update depends on relationships with actual configurations
-              dependsOn (projectsWithModules.map { case (p, m) => new ClasspathDependency(p, m.configurations) }: _*)
+              dependsOn (projectsWithModules.map { case (p, m) => new ClasspathDependency(p, m.configurations) }*)
               // Now fix aggregate relationships
-              aggregate (aggregates.map(x => x: ProjectReference): _*)
+              aggregate (aggregates.map(x => x: ProjectReference)*)
               // Now remove any inter-project dependencies we pulled in from the maven pom.
               // TODO - Maybe we can fix the useMavenPom settings so we don't need to
               // post-filter artifacts?

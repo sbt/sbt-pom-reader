@@ -1,30 +1,30 @@
 package sbtpomreader
 
-import sbtpomreader.MavenUserSettingsHelper._
-import sbtpomreader.SbtPomKeys._
+import sbtpomreader.MavenUserSettingsHelper.*
+import sbtpomreader.SbtPomKeys.*
 
-import sbt._
-import sbt.Keys._
+import sbt.*
+import sbt.Keys.*
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 import scala.util.Try
 
 import org.apache.maven.model.{
-  Dependency => PomDependency,
-  Model => PomModel,
-  Plugin => PomPlugin,
-  Repository => PomRepository
+  Dependency as PomDependency,
+  Model as PomModel,
+  Plugin as PomPlugin,
+  Repository as PomRepository
 }
-import org.apache.maven.settings.{ Settings => MavenSettings }
+import org.apache.maven.settings.Settings as MavenSettings
 
 /** Helper object to extract maven settings. */
 object MavenHelper {
 
   // Load pom values into settings.
-  val useMavenPom: Seq[Setting[_]] =
+  val useMavenPom: Seq[Setting[?]] =
     loadPomInSettings ++ pullSettingsFromPom
 
-  def loadPomInSettings: Seq[Setting[_]] = Seq(
+  def loadPomInSettings: Seq[Setting[?]] = Seq(
     pomLocation := baseDirectory.value / "pom.xml",
     settingsLocation := file(sys.props("user.home")) / ".m2" / "settings.xml",
     mvnLocalRepository := defaultLocalRepo,
@@ -66,7 +66,7 @@ object MavenHelper {
     case _                 => v
   }
 
-  def pullSettingsFromPom: Seq[Setting[_]] = Seq(
+  def pullSettingsFromPom: Seq[Setting[?]] = Seq(
     /* Often poms have artifactId with binary version suffix. This should ideally be removed. */
     name := fromPom(x => removeBinaryVersionSuffix(x.getArtifactId)).value,
     organization := fromPom(_.getGroupId).value,

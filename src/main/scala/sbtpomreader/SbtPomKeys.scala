@@ -1,9 +1,9 @@
 package sbtpomreader
 
-import sbt._
+import sbt.*
 
 import org.apache.maven.model.Model
-import org.apache.maven.settings.{ Settings => MavenSettings }
+import org.apache.maven.settings.Settings as MavenSettings
 
 /** Public plugin keys. */
 trait SbtPomKeys {
