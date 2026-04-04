@@ -83,6 +83,6 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
       val key = "env." + (if (caseInsenstive) entry.getKey.toUpperCase(Locale.ENGLISH)
                           else entry.getKey)
       key -> entry.getValue
-    } { collection.breakOut }
+    }.toMap
   }
 }
