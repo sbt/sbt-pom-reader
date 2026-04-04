@@ -21,6 +21,9 @@ jobs:
           - os: ubuntu-latest
             java: 21
             distribution: temurin
+          - os: ubuntu-latest
+            java: 25
+            distribution: temurin
     runs-on: ${{ matrix.os }}
     env:
       # define Java options for both official sbt and sbt-extras
@@ -28,7 +31,7 @@ jobs:
       JVM_OPTS:  -Dfile.encoding=UTF-8 -Djava.security.manager=allow
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
