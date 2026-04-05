@@ -1,11 +1,11 @@
 package sbtpomreader
 
-import sbt._
+import sbt.*
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
-import org.apache.maven.model.{ Model => PomModel, Repository => PomRepository }
-import org.apache.maven.settings.{ Settings => MavenSettings }
+import org.apache.maven.model.{ Model as PomModel, Repository as PomRepository }
+import org.apache.maven.settings.Settings as MavenSettings
 import org.apache.maven.settings.building.{ DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest }
 
 /**

@@ -1,6 +1,6 @@
 package sbtpomreader
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 import org.apache.maven.model.{ Dependency, Parent, Repository }
 import org.apache.maven.model.building.{ FileModelSource, ModelSource2 }

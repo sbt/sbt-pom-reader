@@ -1,6 +1,6 @@
 package sbtpomreader
 
-import sbt._
+import sbt.*
 import sbt.plugins.JvmPlugin
 
 /** Plugin definition for Maven POM reader. */
