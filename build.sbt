@@ -19,6 +19,14 @@ lazy val root = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(nocomma {
     name := "sbt-pom-reader"
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "2.12" =>
+          Seq("-release:8")
+        case _ =>
+          Nil
+      }
+    }
     scalacOptions ++= Seq(
       "-Wconf:any:wv",
       "-Xlint:unused",
@@ -46,10 +54,12 @@ lazy val root = (project in file("."))
     scriptedLaunchOpts := scriptedLaunchOpts.value ++ Seq("-Dproject.version=" + version.value)
     scriptedLaunchOpts ++= Seq("-Dplugin.version=" + version.value)
     scriptedBufferLog := true
+    crossScalaVersions += "3.8.2"
+    addSbtPlugin("com.github.sbt" % "sbt2-compat" % "0.1.0")
     (pluginCrossBuild / sbtVersion) := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.9.9"
-        case _      => "2.0.0-RC6"
+        case _      => "2.0.0-RC11"
       }
     }
     scriptedSbt := {
