@@ -26,7 +26,8 @@ package object sbtpomreader {
       pom: File,
       localRepo: File = defaultLocalRepo,
       profiles: Seq[String],
-      userProps: Map[String, String]
+      userProps: Map[String, String],
+      settingsFile: File = new File(sys.props("user.home"), ".m2/settings.xml")
   ) =
-    MavenPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles, userProps)
+    MavenPomResolver(localRepo, settingsFile).loadEffectivePom(pom, Seq.empty, profiles, userProps)
 }

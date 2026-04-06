@@ -34,7 +34,8 @@ object MavenHelper {
       pomLocation.value,
       mvnLocalRepository.value,
       profiles.value,
-      mavenUserProperties.value
+      mavenUserProperties.value,
+      settingsLocation.value
     ),
     effectiveSettings := loadUserSettings(settingsLocation.value, profiles.value),
     showEffectivePom := showPom(pomLocation.value, effectivePom.value, streams.value),

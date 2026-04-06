@@ -7,6 +7,8 @@ import scala.collection.JavaConverters.*
 import org.apache.maven.model.{ Model as PomModel, Repository as PomRepository }
 import org.apache.maven.settings.Settings as MavenSettings
 import org.apache.maven.settings.building.{ DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest }
+import org.eclipse.aether.repository.MirrorSelector
+import org.eclipse.aether.util.repository.DefaultMirrorSelector
 
 /**
  * Helper object with functions to extract settings from the user's Maven settings file (typically ~/.m2/settings.xml)
@@ -43,6 +45,27 @@ object MavenUserSettingsHelper {
     for {
       s <- settings.getServers.asScala
     } yield ServerCredentials(s.getId, s.getUsername, s.getPassword)
+
+  /**
+   * Build a MirrorSelector from the mirrors defined in Maven settings.
+   * The returned selector applies the same mirror matching rules as Maven itself
+   * (supporting `*`, `central`, `external:*`, negations like `*,!repo1`, etc.).
+   */
+  def buildMirrorSelector(settings: MavenSettings): MirrorSelector = {
+    val selector = new DefaultMirrorSelector()
+    for (mirror <- settings.getMirrors.asScala) {
+      selector.add(
+        mirror.getId,
+        mirror.getUrl,
+        Option(mirror.getLayout).getOrElse("default"),
+        false,
+        mirror.isBlocked,
+        mirror.getMirrorOf,
+        mirror.getMirrorOfLayouts
+      )
+    }
+    selector
+  }
 
   /** Associates server credentials defined in the settings with repositories referenced in the POM. */
   // TODO - Grab authentication realm...

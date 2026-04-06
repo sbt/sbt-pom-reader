@@ -14,23 +14,44 @@ import org.apache.maven.model.building.{
 }
 import org.apache.maven.model.resolution.ModelResolver
 import org.eclipse.aether.RepositorySystem
-import org.eclipse.aether.repository.RemoteRepository
+import org.eclipse.aether.repository.{ MirrorSelector, RemoteRepository }
 
 object MavenPomResolver {
   val system = newRepositorySystemImpl
   require(system != null, "Repository system failed to initialize")
-  def apply(localRepo: File) = new MavenPomResolver(system, localRepo)
+
+  private[sbtpomreader] def mirrorSelector(settingsFile: File): Option[MirrorSelector] = {
+    MavenUserSettingsHelper.loadUserSettings(settingsFile, Seq.empty).flatMap { settings =>
+      val selector = MavenUserSettingsHelper.buildMirrorSelector(settings)
+      if (settings.getMirrors.isEmpty) None else Some(selector)
+    }
+  }
+
+  def apply(localRepo: File, settingsFile: File) = new MavenPomResolver(system, localRepo, settingsFile)
 }
 
-class MavenPomResolver(system: RepositorySystem, localRepo: File) {
-  val session = newSessionImpl(system, localRepo)
+class MavenPomResolver(system: RepositorySystem, localRepo: File, settingsFile: File) {
+  private val mirrors = MavenPomResolver.mirrorSelector(settingsFile)
+
+  val session = {
+    val s = newSessionImpl(system, localRepo)
+    mirrors.foreach(s.setMirrorSelector)
+    s
+  }
 
   private val modelBuilder = (new DefaultModelBuilderFactory).newInstance
 
-  private val defaultRepositories: Seq[RemoteRepository] =
-    Seq(
-      new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2").build()
-    )
+  private val defaultRepositories: Seq[RemoteRepository] = {
+    val central = new RemoteRepository.Builder(
+      "central", "default", "https://repo.maven.apache.org/maven2"
+    ).build()
+    mirrors match {
+      case Some(selector) =>
+        Seq(Option(selector.getMirror(central)).getOrElse(central))
+      case None =>
+        Seq(central)
+    }
+  }
 
   // TODO - Add repositories from the pom...
   val modelResolver: ModelResolver = {
