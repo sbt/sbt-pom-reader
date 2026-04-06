@@ -20,23 +20,22 @@ object MavenPomResolver {
   val system = newRepositorySystemImpl
   require(system != null, "Repository system failed to initialize")
 
-  private[sbtpomreader] lazy val mirrorSelector: Option[MirrorSelector] = {
-    val settingsFile = new File(
-      sys.props("user.home") + File.separator + ".m2" + File.separator + "settings.xml"
-    )
+  private[sbtpomreader] def mirrorSelector(settingsFile: File): Option[MirrorSelector] = {
     MavenUserSettingsHelper.loadUserSettings(settingsFile, Seq.empty).flatMap { settings =>
       val selector = MavenUserSettingsHelper.buildMirrorSelector(settings)
       if (settings.getMirrors.isEmpty) None else Some(selector)
     }
   }
 
-  def apply(localRepo: File) = new MavenPomResolver(system, localRepo)
+  def apply(localRepo: File, settingsFile: File) = new MavenPomResolver(system, localRepo, settingsFile)
 }
 
-class MavenPomResolver(system: RepositorySystem, localRepo: File) {
+class MavenPomResolver(system: RepositorySystem, localRepo: File, settingsFile: File) {
+  private val mirrors = MavenPomResolver.mirrorSelector(settingsFile)
+
   val session = {
     val s = newSessionImpl(system, localRepo)
-    MavenPomResolver.mirrorSelector.foreach(s.setMirrorSelector)
+    mirrors.foreach(s.setMirrorSelector)
     s
   }
 
@@ -46,7 +45,7 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
     val central = new RemoteRepository.Builder(
       "central", "default", "https://repo.maven.apache.org/maven2"
     ).build()
-    MavenPomResolver.mirrorSelector match {
+    mirrors match {
       case Some(selector) =>
         Seq(Option(selector.getMirror(central)).getOrElse(central))
       case None =>
