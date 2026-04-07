@@ -16,6 +16,7 @@ import org.apache.maven.model.{
   Repository as PomRepository
 }
 import org.apache.maven.settings.Settings as MavenSettings
+import sbtcompat.PluginCompat.*
 
 /** Helper object to extract maven settings. */
 object MavenHelper {
@@ -93,7 +94,7 @@ object MavenHelper {
       pr ++ sr
     },
     // TODO - split into Compile/Test/Runtime/Console
-    scalacOptions ++= {
+    scalacOptions ++= Def.uncached {
       getScalacOptions(effectivePom.value)
     },
     credentials ++= createSbtCredentialsFromUserSettings(effectivePom.value, effectiveSettings.value)
@@ -126,10 +127,10 @@ object MavenHelper {
   }
 
   def getAdditionalSourcesPlugin(pom: PomModel): Seq[PomPlugin] = {
-    pom.getBuild.getPlugins.asScala filter { plugin =>
+    pom.getBuild.getPlugins.asScala.filter { plugin =>
       (plugin.getGroupId == "org.codehaus.mojo") &&
       (plugin.getArtifactId == "build-helper-maven-plugin")
-    }
+    }.toSeq
   }
 
   def getAdditionalSourcesFromPlugin(pom: PomModel): Seq[String] = {
@@ -220,7 +221,7 @@ object MavenHelper {
         case (Some(mScope), Some(mType)) if ("test-jar".equalsIgnoreCase(mType)) =>
           mod
             .withConfigurations(Some(s"${mScope}->test"))
-            .intransitive
+            .intransitive()
         // <classifier>tests</classifier>
         // <scope>SCOPE</scope>
         case (Some(mScope), _) if (mvnClassifier.getOrElse("").equalsIgnoreCase("tests")) =>
@@ -241,7 +242,7 @@ object MavenHelper {
 
   def getDependencies(pom: PomModel): Seq[ModuleID] = {
     for {
-      dep <- pom.getDependencies.asScala
+      dep <- pom.getDependencies.asScala.toSeq
     } yield convertDep(dep)
   }
 
@@ -257,7 +258,7 @@ object MavenHelper {
 
   def getPomResolvers(pom: PomModel): Seq[Resolver] = {
     for {
-      repo <- pom.getRepositories.asScala
+      repo <- pom.getRepositories.asScala.toSeq
       // TODO - Support other layouts
       if repo.getLayout == "default"
     } yield repo.getId at repo.getUrl
@@ -270,7 +271,7 @@ object MavenHelper {
   def getServerRealm(method: String, uri: String): Option[String] = {
     // This is consigned to a Try until proper handling of offline mode.
     Try {
-      val con = url(uri).openConnection.asInstanceOf[java.net.HttpURLConnection]
+      val con = new java.net.URI(uri).toURL.openConnection.asInstanceOf[java.net.HttpURLConnection]
       con setRequestMethod method
       if (con.getResponseCode == 401) {
         val authRealmConfigs = con.getHeaderField("WWW-Authenticate")

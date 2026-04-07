@@ -1,6 +1,6 @@
 package sbtpomreader
 
-import sbt.*
+import sbt.{ given, * }
 
 import scala.collection.JavaConverters.*
 
@@ -103,16 +103,16 @@ object MavenProjectHelper {
           // TODO - Configure debugging output....
           val currentProject: Project = (
             Project(makeProjectName(current.model, overrideRootProjectName), current.dir)
-            // First pull in settings from pom
-              settings (useMavenPom*)
+              // First pull in settings from pom
+              .settings(useMavenPom*)
               // Now update depends on relationships with actual configurations
-              dependsOn (projectsWithModules.map { case (p, m) => new ClasspathDependency(p, m.configurations) }*)
+              .dependsOn(projectsWithModules.map { case (p, m) => new ClasspathDependency(p, m.configurations) }*)
               // Now fix aggregate relationships
-              aggregate (aggregates.map(x => x: ProjectReference)*)
+              .aggregate(aggregates.map(x => x: ProjectReference)*)
               // Now remove any inter-project dependencies we pulled in from the maven pom.
               // TODO - Maybe we can fix the useMavenPom settings so we don't need to
               // post-filter artifacts?
-              settings (
+              .settings(
                 Keys.libraryDependencies := {
                   val depIds = getDepsFor(current).map(_.id).toSet
                   Keys.libraryDependencies.value.filterNot { dep =>
@@ -146,7 +146,7 @@ object MavenProjectHelper {
   // An unsorted walk of the tree
   def allProjectsInTree(tree: ProjectTree): Seq[ProjectTree] =
     tree match {
-      case x: SimpleProject => Seq(x)
+      case x: SimpleProject      => Seq(x)
       case agg: AggregateProject =>
         Seq(agg) ++ agg.children.flatMap(allProjectsInTree)
     }
@@ -156,7 +156,7 @@ object MavenProjectHelper {
       for (project <- projects) yield {
         val deps =
           for {
-            dep <- Option(project.model.getDependencies).map(_.asScala).getOrElse(Nil)
+            dep <- Option(project.model.getDependencies).map(_.asScala.toSeq).getOrElse(Nil)
             depId = makeId(dep.getGroupId, dep.getArtifactId, dep.getVersion)
             pdep <- projects
             if pdep.id == depId
@@ -168,7 +168,7 @@ object MavenProjectHelper {
 
   def getChildProjectPoms(pom: PomModel, pomFile: File): Seq[File] =
     for {
-      childDirName <- Option(pom.getModules) map (_.asScala) getOrElse Nil
+      childDirName <- Option(pom.getModules) map (_.asScala.toSeq) getOrElse Nil
       childPom = pomFile.getParentFile / childDirName / "pom.xml"
       if childPom.exists
     } yield childPom

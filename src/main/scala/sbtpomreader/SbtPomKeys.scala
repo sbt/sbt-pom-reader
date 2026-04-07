@@ -20,6 +20,7 @@ trait SbtPomKeys {
   lazy val effectivePom = SettingKey[Model]("mvn-effective-pom", "Reads the maven effective pom.")
   lazy val effectiveSettings =
     SettingKey[Option[MavenSettings]]("mvn-effective-settings", "The effective maven settings model.")
+  @transient
   lazy val showEffectivePom = TaskKey[Unit]("show-effective-pom", "Displays the effective pom from maven.")
   lazy val mavenUserProperties =
     SettingKey[Map[String, String]]("maven-user-properties", "A map of user properties to be applied")
