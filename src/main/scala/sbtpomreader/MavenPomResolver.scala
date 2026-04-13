@@ -32,15 +32,6 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
       new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2").build()
     )
 
-  // TODO - Add repositories from the pom...
-  val modelResolver: ModelResolver = {
-    new MavenModelResolver(
-      session,
-      system,
-      repositories = defaultRepositories
-    )
-  }
-
   def loadEffectivePom(
       pomFile: File,
       repositories: Seq[RemoteRepository],
@@ -48,6 +39,11 @@ class MavenPomResolver(system: RepositorySystem, localRepo: File) {
       userPropsMap: Map[String, String]
   ): Model =
     try {
+      val modelResolver: ModelResolver = new MavenModelResolver(
+        session,
+        system,
+        repositories = defaultRepositories ++ repositories
+      )
       val userProperties = new java.util.Properties()
       userPropsMap.foreach(kv => userProperties.put(kv._1, kv._2))
       val request = new DefaultModelBuildingRequest

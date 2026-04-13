@@ -30,12 +30,18 @@ object MavenHelper {
     mvnLocalRepository := defaultLocalRepo,
     profiles := Seq.empty,
     mavenUserProperties := Map.empty,
-    effectivePom := loadEffectivePom(
-      pomLocation.value,
-      mvnLocalRepository.value,
-      profiles.value,
-      mavenUserProperties.value
-    ),
+    effectivePom := {
+      val settingsRepos = effectiveSettings.value
+        .map(MavenUserSettingsHelper.getUserRemoteRepositories)
+        .getOrElse(Seq.empty)
+      loadEffectivePom(
+        pomLocation.value,
+        mvnLocalRepository.value,
+        profiles.value,
+        mavenUserProperties.value,
+        settingsRepos
+      )
+    },
     effectiveSettings := loadUserSettings(settingsLocation.value, profiles.value),
     showEffectivePom := showPom(pomLocation.value, effectivePom.value, streams.value),
     isJavaOnly := false
