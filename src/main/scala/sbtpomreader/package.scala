@@ -26,7 +26,8 @@ package object sbtpomreader {
       pom: File,
       localRepo: File = defaultLocalRepo,
       profiles: Seq[String],
-      userProps: Map[String, String]
+      userProps: Map[String, String],
+      additionalRepositories: Seq[org.eclipse.aether.repository.RemoteRepository] = Seq.empty
   ) =
-    MavenPomResolver(localRepo).loadEffectivePom(pom, Seq.empty, profiles, userProps)
+    MavenPomResolver(localRepo).loadEffectivePom(pom, additionalRepositories, profiles, userProps)
 }
