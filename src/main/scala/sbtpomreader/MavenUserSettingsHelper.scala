@@ -7,6 +7,7 @@ import scala.collection.JavaConverters.*
 import org.apache.maven.model.{ Model as PomModel, Repository as PomRepository }
 import org.apache.maven.settings.Settings as MavenSettings
 import org.apache.maven.settings.building.{ DefaultSettingsBuilderFactory, DefaultSettingsBuildingRequest }
+import org.eclipse.aether.repository.RemoteRepository
 
 /**
  * Helper object with functions to extract settings from the user's Maven settings file (typically ~/.m2/settings.xml)
@@ -36,6 +37,16 @@ object MavenUserSettingsHelper {
       profile <- Option(profiles.get(profileName)).toSeq
       repo <- profile.getRepositories.asScala
     } yield repo.getId at repo.getUrl
+  }
+
+  /** Extract repositories from user settings as Aether RemoteRepository objects for POM resolution. */
+  def getUserRemoteRepositories(settings: MavenSettings): Seq[RemoteRepository] = {
+    val profiles = settings.getProfilesAsMap
+    for {
+      profileName <- settings.getActiveProfiles.asScala
+      profile <- Option(profiles.get(profileName)).toSeq
+      repo <- profile.getRepositories.asScala
+    } yield new RemoteRepository.Builder(repo.getId, repo.getLayout, repo.getUrl).build()
   }
 
   /** Extract the server credentials from the given settings file. */
