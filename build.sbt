@@ -1,6 +1,6 @@
 val mvnVersion = "3.9.4"
 val mvnResolverVersion = "1.9.18"
-val scala212 = "2.12.20"
+val scala212 = "2.12.21"
 
 ThisBuild / organization := "com.github.sbt"
 ThisBuild / licenses := Seq(License.Apache2)
