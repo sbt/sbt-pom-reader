@@ -75,7 +75,8 @@ scalacOptions in subproject in Compile in console := Seq.empty
 
 # Contributing
 
-Please feel free to contribute example/test maven projects you'd like to be able to load in sbt.  
+Please feel free to contribute example/test maven projects you'd like to be able to load in sbt.
+"AI"-assisted and/or "AI"-"authored" contributions will not be accepted.
 
 
 # Licensing
