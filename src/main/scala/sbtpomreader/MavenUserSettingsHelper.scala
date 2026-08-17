@@ -33,7 +33,7 @@ object MavenUserSettingsHelper {
   def getUserResolvers(settings: MavenSettings): Seq[Resolver] = {
     val profiles = settings.getProfilesAsMap
     for {
-      profileName <- settings.getActiveProfiles.asScala
+      profileName <- settings.getActiveProfiles.asScala.toSeq
       profile <- Option(profiles.get(profileName)).toSeq
       repo <- profile.getRepositories.asScala
     } yield repo.getId at repo.getUrl
@@ -43,7 +43,7 @@ object MavenUserSettingsHelper {
   def getUserRemoteRepositories(settings: MavenSettings): Seq[RemoteRepository] = {
     val profiles = settings.getProfilesAsMap
     for {
-      profileName <- settings.getActiveProfiles.asScala
+      profileName <- settings.getActiveProfiles.asScala.toSeq
       profile <- Option(profiles.get(profileName)).toSeq
       repo <- profile.getRepositories.asScala
     } yield new RemoteRepository.Builder(repo.getId, repo.getLayout, repo.getUrl).build()
@@ -52,7 +52,7 @@ object MavenUserSettingsHelper {
   /** Extract the server credentials from the given settings file. */
   def serverCredentials(settings: MavenSettings): Seq[ServerCredentials] =
     for {
-      s <- settings.getServers.asScala
+      s <- settings.getServers.asScala.toSeq
     } yield ServerCredentials(s.getId, s.getUsername, s.getPassword)
 
   /** Associates server credentials defined in the settings with repositories referenced in the POM. */
@@ -63,7 +63,7 @@ object MavenUserSettingsHelper {
   ): Seq[(PomRepository, ServerCredentials)] = {
     // TODO: handle repos in settings.xml
     for {
-      repo <- pom.getRepositories.asScala
+      repo <- pom.getRepositories.asScala.toSeq
       cred <- creds
       if cred.id == repo.getId
     } yield (repo -> cred)

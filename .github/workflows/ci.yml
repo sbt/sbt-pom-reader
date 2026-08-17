@@ -38,7 +38,11 @@ jobs:
       - uses: sbt/setup-sbt@v1
       - name: Test
         shell: bash
-        run: sbt -v clean +test +scripted
+        run: sbt -v clean test scripted
+      - name: Test sbt 2
+        shell: bash
+        if: ${{ matrix.java != '8' }}
+        run: sbt -v "++ 3.x" test # TODO enable scripted test
       - name: Ensure formatting
         shell: bash
         run: sbt -v clean scalafmtSbtCheck scalafmtCheckAll
